@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>BlackBoard | Fikir ve Proje Panosu</title>
+    <title>BlackBoard</title>
     <style>
         * {
             margin: 0;
@@ -135,6 +135,10 @@
             font-weight: 500;
             word-break: break-word;
             flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
         .item-badge {
@@ -142,7 +146,6 @@
             background: #1e2a3a;
             padding: 2px 6px;
             border-radius: 20px;
-            margin-left: 8px;
             color: #8ba0bc;
         }
 
@@ -519,7 +522,7 @@
 <script>
     // ---------- INDEXEDDB ----------
     const DB_NAME = 'BlackBoardDB';
-    const DB_VERSION = 3;
+    const DB_VERSION = 5;
     const STORE_NAME = 'appData';
     
     let db = null;
@@ -653,9 +656,9 @@
         if (index !== -1) {
             const f = fikirler[index];
             f.notes.forEach(note => {
-                trashBin.push({ id: nextTrashId++, type: 'not', name: note.title, parentName: f.name, deletedAt: new Date().toISOString() });
+                trashBin.push({ id: nextTrashId++, type: 'not', name: note.title, parentName: f.name, deletedAt: new Date().toISOString(), originalData: note, parentId: f.id, parentType: 'fikir' });
             });
-            trashBin.push({ id: nextTrashId++, type: 'fikir', name: f.name, parentName: 'Genel', deletedAt: new Date().toISOString() });
+            trashBin.push({ id: nextTrashId++, type: 'fikir', name: f.name, parentName: 'Genel', deletedAt: new Date().toISOString(), originalData: { name: f.name, notes: f.notes }, parentId: null, parentType: null });
             fikirler.splice(index, 1);
             if (aktifTip === 'fikir' && aktifId === id) {
                 if (fikirler.length > 0) SetActiveFikir(fikirler[0].id);
@@ -688,6 +691,7 @@
             SetActiveModul(yeniModul.id);
             RenderModuleTabs();
             RenderBoard();
+            RenderSidebar(); // Sidebar güncelle
             SaveToDB();
             ShowToast(`"${name}" modülü eklendi`);
         });
@@ -700,9 +704,9 @@
         if (modulIndex !== -1) {
             const modul = proje.modules[modulIndex];
             modul.notes.forEach(note => {
-                trashBin.push({ id: nextTrashId++, type: 'not', name: note.title, parentName: `${proje.name} / ${modul.name}`, deletedAt: new Date().toISOString() });
+                trashBin.push({ id: nextTrashId++, type: 'not', name: note.title, parentName: `${proje.name} / ${modul.name}`, deletedAt: new Date().toISOString(), originalData: note, parentId: proje.id, parentType: 'proje', modulId: modul.id });
             });
-            trashBin.push({ id: nextTrashId++, type: 'modul', name: modul.name, parentName: proje.name, deletedAt: new Date().toISOString() });
+            trashBin.push({ id: nextTrashId++, type: 'modul', name: modul.name, parentName: proje.name, deletedAt: new Date().toISOString(), originalData: { name: modul.name, notes: modul.notes }, parentId: proje.id, parentType: 'proje' });
             proje.modules.splice(modulIndex, 1);
             if (aktifModulId === modulId) {
                 if (proje.modules.length > 0) SetActiveModul(proje.modules[0].id);
@@ -710,6 +714,7 @@
             }
             RenderModuleTabs();
             RenderBoard();
+            RenderSidebar(); // Sidebar güncelle
             SaveToDB();
             ShowToast(`"${modul.name}" modülü ve notları çöp kutusuna taşındı`);
         }
@@ -747,11 +752,11 @@
             const p = projeler[index];
             p.modules.forEach(modul => {
                 modul.notes.forEach(note => {
-                    trashBin.push({ id: nextTrashId++, type: 'not', name: note.title, parentName: `${p.name} / ${modul.name}`, deletedAt: new Date().toISOString() });
+                    trashBin.push({ id: nextTrashId++, type: 'not', name: note.title, parentName: `${p.name} / ${modul.name}`, deletedAt: new Date().toISOString(), originalData: note, parentId: p.id, parentType: 'proje', modulId: modul.id });
                 });
-                trashBin.push({ id: nextTrashId++, type: 'modul', name: modul.name, parentName: p.name, deletedAt: new Date().toISOString() });
+                trashBin.push({ id: nextTrashId++, type: 'modul', name: modul.name, parentName: p.name, deletedAt: new Date().toISOString(), originalData: { name: modul.name, notes: modul.notes }, parentId: p.id, parentType: 'proje' });
             });
-            trashBin.push({ id: nextTrashId++, type: 'proje', name: p.name, parentName: 'Genel', deletedAt: new Date().toISOString() });
+            trashBin.push({ id: nextTrashId++, type: 'proje', name: p.name, parentName: 'Genel', deletedAt: new Date().toISOString(), originalData: { name: p.name, modules: p.modules }, parentId: null, parentType: null });
             projeler.splice(index, 1);
             if (aktifTip === 'proje' && aktifId === id) {
                 if (projeler.length > 0) SetActiveProje(projeler[0].id);
@@ -792,7 +797,10 @@
                 else { ShowToast("Önce bir modül seçin", 1000); return; }
             }
         }
-        RenderBoard(); SaveToDB(); ShowToast("Not eklendi", 1000);
+        RenderBoard(); 
+        RenderSidebar(); // Not sayısı güncelle
+        SaveToDB(); 
+        ShowToast("Not eklendi", 1000);
     }
     
     function DeleteNote(noteId) {
@@ -802,8 +810,11 @@
                 const index = f.notes.findIndex(n => n.id === noteId);
                 if (index !== -1) {
                     const removed = f.notes.splice(index, 1)[0];
-                    trashBin.push({ id: nextTrashId++, type: 'not', name: removed.title, parentName: f.name, deletedAt: new Date().toISOString() });
-                    RenderBoard(); SaveToDB(); ShowToast("Not çöp kutusuna taşındı", 1000);
+                    trashBin.push({ id: nextTrashId++, type: 'not', name: removed.title, parentName: f.name, deletedAt: new Date().toISOString(), originalData: removed, parentId: f.id, parentType: 'fikir' });
+                    RenderBoard(); 
+                    RenderSidebar(); // Not sayısı güncelle
+                    SaveToDB(); 
+                    ShowToast("Not çöp kutusuna taşındı", 1000);
                 }
             }
         } else if (aktifTip === 'proje') {
@@ -814,12 +825,72 @@
                     const index = modul.notes.findIndex(n => n.id === noteId);
                     if (index !== -1) {
                         const removed = modul.notes.splice(index, 1)[0];
-                        trashBin.push({ id: nextTrashId++, type: 'not', name: removed.title, parentName: `${proje.name} / ${modul.name}`, deletedAt: new Date().toISOString() });
-                        RenderBoard(); SaveToDB(); ShowToast("Not çöp kutusuna taşındı", 1000);
+                        trashBin.push({ id: nextTrashId++, type: 'not', name: removed.title, parentName: `${proje.name} / ${modul.name}`, deletedAt: new Date().toISOString(), originalData: removed, parentId: proje.id, parentType: 'proje', modulId: modul.id });
+                        RenderBoard(); 
+                        RenderSidebar(); // Not sayısı güncelle
+                        SaveToDB(); 
+                        ShowToast("Not çöp kutusuna taşındı", 1000);
                     }
                 }
             }
         }
+    }
+    
+    // ÇÖP KUTUSU GERİ YÜKLEME
+    function RestoreFromTrash(selectedIndices) {
+        for (let i of selectedIndices.sort((a,b)=>b-a)) {
+            const item = trashBin[i];
+            if (item.type === 'fikir') {
+                const yeniFikir = { id: nextFikirId++, name: item.name, notes: item.originalData?.notes || [] };
+                yeniFikir.notes.forEach(n => { if(n.id >= nextNoteId) nextNoteId = n.id + 1; });
+                fikirler.push(yeniFikir);
+            } 
+            else if (item.type === 'proje') {
+                const yeniProje = { id: nextProjeId++, name: item.name, modules: item.originalData?.modules || [] };
+                yeniProje.modules.forEach(m => { if(m.id >= nextModulId) nextModulId = m.id + 1; });
+                yeniProje.modules.forEach(m => m.notes.forEach(n => { if(n.id >= nextNoteId) nextNoteId = n.id + 1; }));
+                projeler.push(yeniProje);
+            }
+            else if (item.type === 'modul') {
+                const proje = projeler.find(p => p.id === item.parentId);
+                if (proje) {
+                    const yeniModul = { id: nextModulId++, name: item.name, notes: item.originalData?.notes || [] };
+                    yeniModul.notes.forEach(n => { if(n.id >= nextNoteId) nextNoteId = n.id + 1; });
+                    proje.modules.push(yeniModul);
+                }
+            }
+            else if (item.type === 'not') {
+                if (item.parentType === 'fikir') {
+                    const fikir = fikirler.find(f => f.id === item.parentId);
+                    if (fikir && item.originalData) {
+                        const yeniNote = { ...item.originalData, id: nextNoteId++ };
+                        fikir.notes.push(yeniNote);
+                    }
+                } else if (item.parentType === 'proje' && item.modulId) {
+                    const proje = projeler.find(p => p.id === item.parentId);
+                    if (proje) {
+                        const modul = proje.modules.find(m => m.id === item.modulId);
+                        if (modul && item.originalData) {
+                            const yeniNote = { ...item.originalData, id: nextNoteId++ };
+                            modul.notes.push(yeniNote);
+                        }
+                    }
+                }
+            }
+            trashBin.splice(i, 1);
+        }
+        // Aktif görünümü güncelle
+        if (aktifTip === 'fikir' && !fikirler.find(f=>f.id===aktifId)) {
+            if (fikirler.length > 0) SetActiveFikir(fikirler[0].id);
+            else if (projeler.length > 0) SetActiveProje(projeler[0].id);
+        } else if (aktifTip === 'proje' && !projeler.find(p=>p.id===aktifId)) {
+            if (projeler.length > 0) SetActiveProje(projeler[0].id);
+            else if (fikirler.length > 0) SetActiveFikir(fikirler[0].id);
+        }
+        RenderSidebar();
+        RenderModuleTabs();
+        RenderBoard();
+        SaveToDB();
     }
     
     // RENDER FONKSİYONLARI
@@ -952,7 +1023,7 @@
             return;
         }
         const modal = document.createElement('div'); modal.className = 'modal-overlay';
-        modal.innerHTML = `<div class="modal-container" style="width: 500px;"><h3>Çöp Kutusu</h3><div class="trash-list" id="TrashListModal"></div><div class="modal-buttons" style="justify-content: space-between;"><div><button class="modal-btn modal-btn-cancel" id="SelectAllBtn">Tümünü Seç</button></div><div style="display: flex; gap: 8px;"><button class="modal-btn modal-btn-cancel" id="RestoreSelectedBtn">Geri Yükle</button><button class="modal-btn modal-btn-danger" id="DeleteSelectedBtn">Kalıcı Sil</button><button class="modal-btn modal-btn-cancel" id="CloseTrashBtn">Kapat</button></div></div></div>`;
+        modal.innerHTML = `<div class="modal-container" style="width: 500px;"><h3>Çöp Kutusu</h3><div class="trash-list" id="TrashListModal"></div><div class="modal-buttons" style="justify-content: space-between;"><div><button class="modal-btn modal-btn-cancel" id="SelectAllBtn">Tümünü Seç</button></div><div style="display: flex; gap: 8px;"><button class="modal-btn modal-btn-confirm" id="RestoreSelectedBtn">Geri Yükle</button><button class="modal-btn modal-btn-danger" id="DeleteSelectedBtn">Kalıcı Sil</button><button class="modal-btn modal-btn-cancel" id="CloseTrashBtn">Kapat</button></div></div></div>`;
         document.body.appendChild(modal);
         const listDiv = modal.querySelector('#TrashListModal');
         let selected = new Array(trashBin.length).fill(false);
@@ -970,10 +1041,11 @@
         RenderList();
         modal.querySelector('#SelectAllBtn').onclick = () => { selected.fill(true); RenderList(); };
         modal.querySelector('#RestoreSelectedBtn').onclick = () => {
-            const indices = selected.map((v, i) => v ? i : -1).filter(i => i !== -1).reverse();
+            const indices = selected.map((v, i) => v ? i : -1).filter(i => i !== -1);
             if (indices.length === 0) { ShowToast("Lütfen öğe seçin", 1000); return; }
-            indices.forEach(i => trashBin.splice(i, 1));
-            SaveToDB(); modal.remove(); ShowToast(`${indices.length} öğe çöp kutusundan kaldırıldı`, 1500);
+            RestoreFromTrash(indices);
+            modal.remove(); 
+            ShowToast(`${indices.length} öğe geri yüklendi`, 1500);
         };
         modal.querySelector('#DeleteSelectedBtn').onclick = () => {
             const indices = selected.map((v, i) => v ? i : -1).filter(i => i !== -1).reverse();
