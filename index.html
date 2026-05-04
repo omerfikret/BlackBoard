@@ -9,6 +9,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            user-select: none;
         }
 
         body {
@@ -24,6 +25,7 @@
             width: 100%;
         }
 
+        /* Sidebar Styles */
         .sidebar {
             width: 320px;
             background: #0f1117;
@@ -200,6 +202,7 @@
             color: #ffaaaa;
         }
 
+        /* Main Board Styles */
         .main-board {
             flex: 1;
             background: #0a0a0f;
@@ -212,15 +215,136 @@
             padding: 16px 28px;
             background: rgba(10, 10, 15, 0.95);
             border-bottom: 1px solid #1f2c38;
+        }
+
+        .header-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 12px;
         }
 
         .active-info h3 {
             color: #f1f5f9;
             font-size: 1.1rem;
             font-weight: 500;
+        }
+
+        .board-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        .action-btn {
+            background: #11161f;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 30px;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.8rem;
+            min-width: 140px;
+        }
+
+        .action-btn:hover {
+            background: #1e3a5f;
+        }
+
+        /* Line Editor Bar */
+        .line-editor-bar {
+            background: #0f2b3f;
+            border-radius: 12px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .line-editor-label {
+            color: #7ab7ef;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .color-picker-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .line-color-option {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: 0.1s;
+        }
+
+        .line-color-option:hover {
+            transform: scale(1.15);
+            border-color: white;
+        }
+
+        .stroke-btn {
+            background: #1e2a3a;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 20px;
+            color: white;
+            font-size: 0.7rem;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .stroke-btn:hover {
+            background: #3b82f6;
+        }
+
+        .line-action-btn {
+            background: #2a1a22;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 20px;
+            color: #f08b8b;
+            font-size: 0.7rem;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .line-action-btn:hover {
+            background: #b91c1c;
+            color: white;
+        }
+
+        .close-editor-btn {
+            background: #1e2a3a;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 20px;
+            color: #a0b3d0;
+            font-size: 0.7rem;
+            cursor: pointer;
+            font-family: inherit;
+            margin-left: auto;
+        }
+
+        .close-editor-btn:hover {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .selection-info {
+            color: #60a5fa;
+            font-size: 0.7rem;
+            background: #1e3a5f;
+            padding: 4px 10px;
+            border-radius: 20px;
         }
 
         .module-tabs {
@@ -285,26 +409,6 @@
             gap: 4px;
         }
 
-        .board-actions {
-            display: flex;
-            gap: 12px;
-        }
-
-        .action-btn {
-            background: #11161f;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 30px;
-            color: white;
-            font-weight: 500;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-
-        .action-btn:hover {
-            background: #1e3a5f;
-        }
-
         .whiteboard-canvas {
             flex: 1;
             position: relative;
@@ -312,27 +416,47 @@
             background: radial-gradient(circle at 10% 20%, #0f121a, #050508);
             background-image: linear-gradient(rgba(59,130,246,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.05) 1px, transparent 1px);
             background-size: 28px 28px;
+            cursor: default;
         }
 
         .notes-container {
             position: relative;
             width: 100%;
             height: 100%;
+            overflow: visible;
         }
 
+        /* Selection Rectangle */
+        .selection-rect {
+            position: absolute;
+            border: 2px solid #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+            pointer-events: none;
+            z-index: 200;
+            display: none;
+        }
+
+        /* Card Styles */
         .idea-card {
             position: absolute;
-            min-width: 200px;
-            max-width: 280px;
+            min-width: 220px;
+            max-width: 300px;
             background: #141a24;
             border-radius: 16px;
             padding: 12px 14px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.4);
             cursor: grab;
             border: 1px solid rgba(59,130,246,0.3);
+            transition: box-shadow 0.2s, transform 0.1s;
+            z-index: 10;
         }
 
         .idea-card:active { cursor: grabbing; }
+        .idea-card.selected-card {
+            box-shadow: 0 0 0 3px #3b82f6, 0 8px 20px rgba(0,0,0,0.4);
+            z-index: 100;
+            transform: scale(1.02);
+        }
 
         .card-header {
             display: flex;
@@ -341,19 +465,51 @@
             margin-bottom: 8px;
         }
 
-        .drag-area { cursor: grab; color: #5a6e8a; font-size: 14px; padding: 0 4px; }
+        .drag-area { 
+            cursor: grab; 
+            color: #5a6e8a; 
+            font-size: 14px; 
+            padding: 0 4px;
+            user-select: none;
+        }
+        
+        .connector-btn {
+            cursor: pointer;
+            background: #3b82f6;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        
+        .connector-btn:hover {
+            background: #60a5fa;
+            transform: scale(1.1);
+        }
+        
+        .connector-btn.active-connector {
+            background: #f59e0b;
+            box-shadow: 0 0 8px #f59e0b;
+        }
+
         .card-title {
             font-weight: 600;
             font-size: 0.85rem;
             background: transparent;
             border: none;
             color: #f0f4fe;
-            width: 65%;
+            width: 60%;
             padding: 4px 0;
             font-family: inherit;
             border-bottom: 1px dashed #2c4c6e;
         }
+        
         .card-title:focus { outline: none; border-bottom-color: #3b82f6; }
+        
         .card-content {
             font-size: 0.75rem;
             color: #cbd5e6;
@@ -366,7 +522,9 @@
             margin-top: 6px;
             font-family: inherit;
         }
+        
         .card-content:focus { outline: none; background: #1a2230; }
+        
         .delete-card {
             background: #2a1a22;
             border: none;
@@ -377,7 +535,9 @@
             cursor: pointer;
             font-size: 12px;
         }
+        
         .delete-card:hover { background: #b91c1c; color: white; }
+        
         .color-selector {
             margin-top: 8px;
             display: flex;
@@ -386,6 +546,7 @@
             border-top: 1px solid #1e2a3a;
             padding-top: 8px;
         }
+        
         .color-option {
             width: 22px;
             height: 22px;
@@ -393,6 +554,44 @@
             cursor: pointer;
             border: 1px solid rgba(255,255,255,0.3);
         }
+
+        /* Connection Points */
+        .connection-point {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #3b82f6;
+            border-radius: 50%;
+            cursor: crosshair;
+            transition: all 0.2s;
+            z-index: 15;
+            border: 2px solid white;
+        }
+        
+        .connection-point:hover {
+            background: #f59e0b;
+            transform: scale(1.3);
+        }
+        
+        .connection-point.top { top: -6px; left: 50%; transform: translateX(-50%); }
+        .connection-point.bottom { bottom: -6px; left: 50%; transform: translateX(-50%); }
+        .connection-point.left { left: -6px; top: 50%; transform: translateY(-50%); }
+        .connection-point.right { right: -6px; top: 50%; transform: translateY(-50%); }
+
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 6;
+        }
+        
+        svg line {
+            pointer-events: stroke;
+        }
+
         .toast-msg {
             position: fixed;
             bottom: 30px;
@@ -418,6 +617,7 @@
             align-items: center;
             justify-content: center;
         }
+        
         .modal-container {
             background: #11161f;
             border-radius: 20px;
@@ -426,6 +626,7 @@
             padding: 24px;
             border: 1px solid #2c4c6e;
         }
+        
         .modal-container h3 { color: white; margin-bottom: 16px; font-size: 1.2rem; }
         .modal-input {
             width: 100%;
@@ -487,7 +688,7 @@
         </div>
         <div class="lists-container">
             <div class="list-section">
-                <div class="section-label">FİKİRLER</div>
+                <div class="section-label">FIKIRLER</div>
                 <div class="items-list" id="fikirlerList"></div>
             </div>
             <div class="list-section">
@@ -502,18 +703,22 @@
 
     <div class="main-board">
         <div class="board-header">
-            <div class="active-info">
-                <h3 id="ActiveTitle">Ana Pano</h3>
-                <div id="ModuleTabsContainer" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px;"></div>
+            <div class="header-top">
+                <div class="active-info">
+                    <h3 id="ActiveTitle">Ana Pano</h3>
+                </div>
+                <div class="board-actions">
+                    <button class="action-btn" id="AddNoteToActiveBtn">+ Not Ekle</button>
+                    <button class="action-btn" id="EnableLineEditBtn" style="background:#1e3a5f;">Cizgileri Duzenle</button>
+                </div>
             </div>
-            <div class="board-actions">
-                <button class="action-btn" id="AddNoteToActiveBtn">+ Not Ekle</button>
-            </div>
+            <div id="LineEditorContainer"></div>
+            <div id="ModuleTabsContainer" class="module-tabs"></div>
         </div>
-        <div class="whiteboard-canvas">
-            <div class="notes-container" id="NotesContainer">
-                <div style="color:#5a6e85; text-align:center; margin-top:80px;">Bir fikir veya proje seçin</div>
-            </div>
+        <div class="whiteboard-canvas" id="WhiteboardCanvas">
+            <div class="selection-rect" id="SelectionRect"></div>
+            <svg id="LinesSvg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 6;"></svg>
+            <div class="notes-container" id="NotesContainer"></div>
         </div>
     </div>
 </div>
@@ -522,7 +727,7 @@
 <script>
     // ---------- INDEXEDDB ----------
     const DB_NAME = 'BlackBoardDB';
-    const DB_VERSION = 5;
+    const DB_VERSION = 9;
     const STORE_NAME = 'appData';
     
     let db = null;
@@ -539,19 +744,42 @@
     let nextModulId = 1;
     let nextNoteId = 100;
     let nextTrashId = 1;
+    let nextConnectionId = 1;
     
-    const colorPalette = ["#1e293b", "#2d1b36", "#1a2e3a", "#2a2a35", "#1e3a4d", "#2c2a3e", "#1f3a3f"];
+    // Cizgi baglantilari
+    let connections = [];
+    let lineColors = {};
+    let lineWidths = {};
+    let selectedCardId = null;
+    let isConnectingMode = false;
+    let connectingFromCard = null;
+    
+    // Cizgi duzenleme modu
+    let isLineEditMode = false;
+    let selectedLineIds = new Set();
+    
+    // Mouse selection
+    let isSelecting = false;
+    let selectionStart = { x: 0, y: 0 };
+    let selectionRect = null;
+    let selectedNoteIds = new Set();
+    
+    const colorPalette = ["#1e293b", "#2d1b36", "#1a2e3a", "#2a2a35", "#1e3a4d", "#2c2a3e", "#1f3a3f", "#3b2f2f", "#2f3b2f"];
+    const lineColorsList = ["#60a5fa", "#f59e0b", "#10b981", "#ef4444", "#a855f7", "#ec489a", "#14b8a6", "#f97316", "#8b5cf6"];
     
     const fikirlerListDiv = document.getElementById('fikirlerList');
     const projelerListDiv = document.getElementById('projelerList');
     const notesContainer = document.getElementById('NotesContainer');
+    const whiteboardCanvas = document.getElementById('WhiteboardCanvas');
     const activeTitleSpan = document.getElementById('ActiveTitle');
     const moduleTabsContainer = document.getElementById('ModuleTabsContainer');
+    const lineEditorContainer = document.getElementById('LineEditorContainer');
     const toastEl = document.getElementById('ToastMsg');
+    const linesSvg = document.getElementById('LinesSvg');
     
     function ShowToast(msg, duration = 1500) {
         toastEl.style.opacity = '1';
-        toastEl.innerText = msg.charAt(0).toUpperCase() + msg.slice(1);
+        toastEl.innerText = msg;
         setTimeout(() => { toastEl.style.opacity = '0'; }, duration);
     }
     
@@ -572,7 +800,7 @@
     
     async function SaveToDB() {
         if (!db) return;
-        const data = { fikirler, projeler, aktifTip, aktifId, aktifModulId, trashBin, nextFikirId, nextProjeId, nextModulId, nextNoteId, nextTrashId };
+        const data = { fikirler, projeler, aktifTip, aktifId, aktifModulId, trashBin, nextFikirId, nextProjeId, nextModulId, nextNoteId, nextTrashId, nextConnectionId, connections, lineColors, lineWidths };
         const tx = db.transaction(STORE_NAME, 'readwrite');
         tx.objectStore(STORE_NAME).put(data, 'mainData');
         return tx.complete;
@@ -592,11 +820,15 @@
                     aktifId = data.aktifId || null;
                     aktifModulId = data.aktifModulId || null;
                     trashBin = data.trashBin || [];
+                    connections = data.connections || [];
+                    lineColors = data.lineColors || {};
+                    lineWidths = data.lineWidths || {};
                     nextFikirId = data.nextFikirId || 1;
                     nextProjeId = data.nextProjeId || 1;
                     nextModulId = data.nextModulId || 1;
                     nextNoteId = data.nextNoteId || 100;
                     nextTrashId = data.nextTrashId || 1;
+                    nextConnectionId = data.nextConnectionId || 1;
                 } else CreateInitialData();
                 resolve(true);
             };
@@ -605,18 +837,21 @@
     }
     
     function CreateInitialData() {
-        fikirler = [{ id: nextFikirId++, name: "Mobil Uygulama", notes: [{ id: nextNoteId++, title: "Ana Özellik", content: "Kullanıcı dostu arayüz", left: 100, top: 80, bgColor: "#1e293b" }] }];
-        const modul1 = { id: nextModulId++, name: "Ana Modül", notes: [{ id: nextNoteId++, title: "Başlangıç", content: "Proje notları burada", left: 200, top: 120, bgColor: "#1e293b" }] };
-        const modul2 = { id: nextModulId++, name: "Algoritmalar", notes: [{ id: nextNoteId++, title: "Drone Algoritması", content: "PID kontrol, sensör füzyonu", left: 400, top: 160, bgColor: "#1e3a4d" }] };
+        fikirler = [{ id: nextFikirId++, name: "Mobil Uygulama", notes: [{ id: nextNoteId++, title: "Ana Ozellik", content: "Kullanici dostu arayuz", left: 100, top: 80, bgColor: "#1e293b" }] }];
+        const modul1 = { id: nextModulId++, name: "Ana Modul", notes: [{ id: nextNoteId++, title: "Baslangic", content: "Proje notlari burada", left: 200, top: 120, bgColor: "#1e293b" }] };
+        const modul2 = { id: nextModulId++, name: "Algoritmalar", notes: [{ id: nextNoteId++, title: "Drone Algoritmasi", content: "PID kontrol, sensor fuzyonu", left: 400, top: 160, bgColor: "#1e3a4d" }] };
         projeler = [{ id: nextProjeId++, name: "Drone Projesi", modules: [modul1, modul2] }];
         aktifTip = 'fikir';
         aktifId = fikirler[0].id;
         aktifModulId = null;
+        connections = [];
+        lineColors = {};
+        lineWidths = {};
     }
     
     function ShowModal(title, placeholder, onConfirm, defaultValue = "") {
         const modal = document.createElement('div'); modal.className = 'modal-overlay';
-        modal.innerHTML = `<div class="modal-container"><h3>${title}</h3><input type="text" class="modal-input" id="ModalInput" placeholder="${placeholder}" value="${defaultValue.replace(/"/g, '&quot;')}"><div class="modal-buttons"><button class="modal-btn modal-btn-cancel" id="ModalCancel">İptal</button><button class="modal-btn modal-btn-confirm" id="ModalConfirm">Ekle</button></div></div>`;
+        modal.innerHTML = `<div class="modal-container"><h3>${title}</h3><input type="text" class="modal-input" id="ModalInput" placeholder="${placeholder}" value="${defaultValue.replace(/"/g, '&quot;')}"><div class="modal-buttons"><button class="modal-btn modal-btn-cancel" id="ModalCancel">Iptal</button><button class="modal-btn modal-btn-confirm" id="ModalConfirm">Ekle</button></div></div>`;
         document.body.appendChild(modal);
         const input = modal.querySelector('#ModalInput');
         input.focus();
@@ -626,15 +861,268 @@
         input.addEventListener('keypress', (e) => { if (e.key === 'Enter') modal.querySelector('#ModalConfirm').click(); });
     }
     
-    // FİKİR İŞLEMLERİ
+    // MOUSE SELECTION (Alan Secme)
+    function initSelection() {
+        selectionRect = document.getElementById('SelectionRect');
+        
+        whiteboardCanvas.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.idea-card') || e.target.closest('.connection-point') || e.target.closest('.connector-btn')) return;
+            if (e.button !== 0) return;
+            
+            isSelecting = true;
+            const rect = whiteboardCanvas.getBoundingClientRect();
+            selectionStart.x = e.clientX - rect.left;
+            selectionStart.y = e.clientY - rect.top;
+            selectionRect.style.display = 'block';
+            selectionRect.style.left = selectionStart.x + 'px';
+            selectionRect.style.top = selectionStart.y + 'px';
+            selectionRect.style.width = '0px';
+            selectionRect.style.height = '0px';
+        });
+        
+        window.addEventListener('mousemove', (e) => {
+            if (!isSelecting) return;
+            const rect = whiteboardCanvas.getBoundingClientRect();
+            const currentX = e.clientX - rect.left;
+            const currentY = e.clientY - rect.top;
+            
+            const left = Math.min(selectionStart.x, currentX);
+            const top = Math.min(selectionStart.y, currentY);
+            const width = Math.abs(currentX - selectionStart.x);
+            const height = Math.abs(currentY - selectionStart.y);
+            
+            selectionRect.style.left = left + 'px';
+            selectionRect.style.top = top + 'px';
+            selectionRect.style.width = width + 'px';
+            selectionRect.style.height = height + 'px';
+        });
+        
+        window.addEventListener('mouseup', (e) => {
+            if (!isSelecting) return;
+            isSelecting = false;
+            
+            const rect = whiteboardCanvas.getBoundingClientRect();
+            const endX = e.clientX - rect.left;
+            const endY = e.clientY - rect.top;
+            
+            const left = Math.min(selectionStart.x, endX);
+            const top = Math.min(selectionStart.y, endY);
+            const right = Math.max(selectionStart.x, endX);
+            const bottom = Math.max(selectionStart.y, endY);
+            
+            if (right - left > 5 && bottom - top > 5) {
+                document.querySelectorAll('.idea-card').forEach(card => {
+                    const cardRect = card.getBoundingClientRect();
+                    const cardLeft = cardRect.left - rect.left;
+                    const cardTop = cardRect.top - rect.top;
+                    const cardRight = cardRect.right - rect.left;
+                    const cardBottom = cardRect.bottom - rect.top;
+                    
+                    if (cardRight > left && cardLeft < right && cardBottom > top && cardTop < bottom) {
+                        const noteId = parseInt(card.getAttribute('data-note-id'));
+                        selectedNoteIds.add(noteId);
+                        card.classList.add('selected-card');
+                    }
+                });
+                if (selectedNoteIds.size > 0) {
+                    ShowToast(selectedNoteIds.size + " not secildi. Silmek icin Delete tusuna basin.", 2000);
+                }
+            }
+            
+            selectionRect.style.display = 'none';
+        });
+        
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Delete' && selectedNoteIds.size > 0) {
+                if (confirm(selectedNoteIds.size + " notu silmek istediginize emin misiniz?")) {
+                    selectedNoteIds.forEach(noteId => DeleteNote(noteId));
+                    selectedNoteIds.clear();
+                    ShowToast("Secilen notlar silindi", 1000);
+                }
+            }
+            if (e.key === 'Escape') {
+                selectedNoteIds.clear();
+                document.querySelectorAll('.idea-card').forEach(c => c.classList.remove('selected-card'));
+                ShowToast("Secim kaldirildi", 800);
+            }
+        });
+    }
+    
+    // CIZGI DUZENLEME MODU
+    function EnableLineEditMode() {
+        if (connections.length === 0) {
+            ShowToast("Duzelenecek cizgi yok", 1500);
+            return;
+        }
+        isLineEditMode = true;
+        selectedLineIds.clear();
+        RenderLineEditorBar();
+        RenderLines();
+        ShowToast("Cizgi duzenleme modu aktif - cizgilere tiklayarak secin", 2000);
+    }
+    
+    function DisableLineEditMode() {
+        isLineEditMode = false;
+        selectedLineIds.clear();
+        RenderLineEditorBar();
+        RenderLines();
+        ShowToast("Cizgi duzenleme modu kapandi", 1000);
+    }
+    
+    function ToggleLineSelection(lineId) {
+        if (!isLineEditMode) return;
+        if (selectedLineIds.has(lineId)) {
+            selectedLineIds.delete(lineId);
+        } else {
+            selectedLineIds.add(lineId);
+        }
+        RenderLineEditorBar();
+        RenderLines();
+    }
+    
+    function SelectAllLines() {
+        if (!isLineEditMode) return;
+        connections.forEach(c => selectedLineIds.add(c.id));
+        RenderLineEditorBar();
+        RenderLines();
+        ShowToast(selectedLineIds.size + " cizgi secildi", 1000);
+    }
+    
+    function DeselectAllLines() {
+        if (!isLineEditMode) return;
+        selectedLineIds.clear();
+        RenderLineEditorBar();
+        RenderLines();
+        ShowToast("Secim kaldirildi", 800);
+    }
+    
+    function ApplyColorToSelected(color) {
+        if (selectedLineIds.size === 0) {
+            ShowToast("Once cizgi secin", 1000);
+            return;
+        }
+        selectedLineIds.forEach(id => {
+            lineColors[id] = color;
+        });
+        RenderLines();
+        SaveToDB();
+        ShowToast(selectedLineIds.size + " cizginin rengi degistirildi", 1000);
+    }
+    
+    function ApplyStrokeToSelected(width) {
+        if (selectedLineIds.size === 0) {
+            ShowToast("Once cizgi secin", 1000);
+            return;
+        }
+        selectedLineIds.forEach(id => {
+            lineWidths[id] = width;
+        });
+        RenderLines();
+        SaveToDB();
+        ShowToast(selectedLineIds.size + " cizginin kalinligi degistirildi", 1000);
+    }
+    
+    function DeleteSelectedLines() {
+        if (selectedLineIds.size === 0) {
+            ShowToast("Silinecek cizgi secin", 1000);
+            return;
+        }
+        if (confirm(selectedLineIds.size + " cizgiyi silmek istediginize emin misiniz?")) {
+            connections = connections.filter(c => !selectedLineIds.has(c.id));
+            selectedLineIds.forEach(id => {
+                delete lineColors[id];
+                delete lineWidths[id];
+            });
+            selectedLineIds.clear();
+            SaveToDB();
+            RenderLines();
+            if (connections.length === 0) {
+                DisableLineEditMode();
+            } else {
+                RenderLineEditorBar();
+            }
+            ShowToast("Secilen cizgiler silindi", 1200);
+        }
+    }
+    
+    function DeleteAllLines() {
+        if (connections.length === 0) {
+            ShowToast("Silinecek cizgi yok", 1000);
+            return;
+        }
+        if (confirm("Tum " + connections.length + " cizgiyi silmek istediginize emin misiniz?")) {
+            connections = [];
+            lineColors = {};
+            lineWidths = {};
+            selectedLineIds.clear();
+            SaveToDB();
+            RenderLines();
+            DisableLineEditMode();
+            ShowToast("Tum cizgiler silindi", 1200);
+        }
+    }
+    
+    function RenderLineEditorBar() {
+        if (!isLineEditMode) {
+            lineEditorContainer.innerHTML = '';
+            return;
+        }
+        
+        lineEditorContainer.innerHTML = `
+            <div class="line-editor-bar">
+                <span class="line-editor-label">Cizgi Duzenleme Modu</span>
+                <span class="selection-info">${selectedLineIds.size} secili</span>
+                
+                <div class="color-picker-group">
+                    ${lineColorsList.map(color => `
+                        <div class="line-color-option" style="background:${color}" data-color="${color}"></div>
+                    `).join('')}
+                </div>
+                
+                <div class="color-picker-group">
+                    <button class="stroke-btn" data-width="2">Ince</button>
+                    <button class="stroke-btn" data-width="4">Normal</button>
+                    <button class="stroke-btn" data-width="6">Kalin</button>
+                </div>
+                
+                <div class="color-picker-group">
+                    <button class="line-action-btn" id="SelectAllLinesBtn">Tumunu Sec</button>
+                    <button class="line-action-btn" id="DeselectAllLinesBtn">Secimi Kaldir</button>
+                    <button class="line-action-btn" id="DeleteSelectedLinesBtn" style="background:#b91c1c; color:white;">Secilenleri Sil</button>
+                    <button class="line-action-btn" id="DeleteAllLinesBtn" style="background:#b91c1c; color:white;">Tumunu Sil</button>
+                </div>
+                
+                <button class="close-editor-btn" id="CloseLineEditorBtn">Duzenlemeyi Kapat</button>
+            </div>
+        `;
+        
+        document.querySelectorAll('.line-color-option').forEach(el => {
+            el.onclick = () => ApplyColorToSelected(el.getAttribute('data-color'));
+        });
+        document.querySelectorAll('.stroke-btn').forEach(el => {
+            el.onclick = () => ApplyStrokeToSelected(parseInt(el.getAttribute('data-width')));
+        });
+        const selectAllBtn = document.getElementById('SelectAllLinesBtn');
+        if (selectAllBtn) selectAllBtn.onclick = () => SelectAllLines();
+        const deselectAllBtn = document.getElementById('DeselectAllLinesBtn');
+        if (deselectAllBtn) deselectAllBtn.onclick = () => DeselectAllLines();
+        const deleteSelectedBtn = document.getElementById('DeleteSelectedLinesBtn');
+        if (deleteSelectedBtn) deleteSelectedBtn.onclick = () => DeleteSelectedLines();
+        const deleteAllBtn = document.getElementById('DeleteAllLinesBtn');
+        if (deleteAllBtn) deleteAllBtn.onclick = () => DeleteAllLines();
+        const closeBtn = document.getElementById('CloseLineEditorBtn');
+        if (closeBtn) closeBtn.onclick = () => DisableLineEditMode();
+    }
+    
+    // FIKIR ISLEMLERI
     function AddNewFikir() {
-        ShowModal('Yeni Fikir', 'Fikir adı...', (name) => {
+        ShowModal('Yeni Fikir', 'Fikir adi...', (name) => {
             const yeniFikir = { id: nextFikirId++, name: name, notes: [] };
             fikirler.push(yeniFikir);
             RenderSidebar();
             SetActiveFikir(yeniFikir.id);
             SaveToDB();
-            ShowToast(`"${name}" fikri eklendi`);
+            ShowToast('"' + name + '" fikri eklendi');
         });
     }
     
@@ -646,6 +1134,11 @@
         aktifModulId = null;
         activeTitleSpan.innerText = f.name;
         moduleTabsContainer.innerHTML = '';
+        selectedCardId = null;
+        isConnectingMode = false;
+        connectingFromCard = null;
+        selectedNoteIds.clear();
+        if (isLineEditMode) DisableLineEditMode();
         RenderSidebar();
         RenderBoard();
         SaveToDB();
@@ -665,35 +1158,36 @@
                 else if (projeler.length > 0) SetActiveProje(projeler[0].id);
                 else { aktifTip = null; aktifId = null; activeTitleSpan.innerText = "Ana Pano"; moduleTabsContainer.innerHTML = ''; RenderBoard(); }
             }
-            RenderSidebar(); SaveToDB(); ShowToast(`"${f.name}" fikri ve notları çöp kutusuna taşındı`);
+            if (isLineEditMode) DisableLineEditMode();
+            RenderSidebar(); SaveToDB(); ShowToast('"' + f.name + '" fikri ve notlari cop kutusuna tasindi');
         }
     }
     
-    // PROJE İŞLEMLERİ
+    // PROJE ISLEMLERI
     function AddNewProje() {
-        ShowModal('Yeni Proje', 'Proje adı...', (name) => {
+        ShowModal('Yeni Proje', 'Proje adi...', (name) => {
             const yeniProje = { id: nextProjeId++, name: name, modules: [] };
             projeler.push(yeniProje);
             RenderSidebar();
             SetActiveProje(yeniProje.id);
             SaveToDB();
-            ShowToast(`"${name}" projesi eklendi`);
+            ShowToast('"' + name + '" projesi eklendi');
         });
     }
     
     function AddNewModule() {
         const proje = projeler.find(p => p.id === aktifId);
-        if (!proje && aktifTip === 'proje') { ShowToast("Önce bir proje seçin", 1000); return; }
-        if (aktifTip !== 'proje') { ShowToast("Modül eklemek için bir proje seçin", 1000); return; }
-        ShowModal('Yeni Modül', 'Modül adı (örn: algoritmalar, tasarım)...', (name) => {
+        if (!proje && aktifTip === 'proje') { ShowToast("Once bir proje secin", 1000); return; }
+        if (aktifTip !== 'proje') { ShowToast("Modul eklemek icin bir proje secin", 1000); return; }
+        ShowModal('Yeni Modul', 'Modul adi (orn: algoritmalar, tasarim)...', (name) => {
             const yeniModul = { id: nextModulId++, name: name, notes: [] };
             proje.modules.push(yeniModul);
             SetActiveModul(yeniModul.id);
             RenderModuleTabs();
             RenderBoard();
-            RenderSidebar(); // Sidebar güncelle
+            RenderSidebar();
             SaveToDB();
-            ShowToast(`"${name}" modülü eklendi`);
+            ShowToast('"' + name + '" modulu eklendi');
         });
     }
     
@@ -704,7 +1198,7 @@
         if (modulIndex !== -1) {
             const modul = proje.modules[modulIndex];
             modul.notes.forEach(note => {
-                trashBin.push({ id: nextTrashId++, type: 'not', name: note.title, parentName: `${proje.name} / ${modul.name}`, deletedAt: new Date().toISOString(), originalData: note, parentId: proje.id, parentType: 'proje', modulId: modul.id });
+                trashBin.push({ id: nextTrashId++, type: 'not', name: note.title, parentName: proje.name + " / " + modul.name, deletedAt: new Date().toISOString(), originalData: note, parentId: proje.id, parentType: 'proje', modulId: modul.id });
             });
             trashBin.push({ id: nextTrashId++, type: 'modul', name: modul.name, parentName: proje.name, deletedAt: new Date().toISOString(), originalData: { name: modul.name, notes: modul.notes }, parentId: proje.id, parentType: 'proje' });
             proje.modules.splice(modulIndex, 1);
@@ -714,9 +1208,9 @@
             }
             RenderModuleTabs();
             RenderBoard();
-            RenderSidebar(); // Sidebar güncelle
+            RenderSidebar();
             SaveToDB();
-            ShowToast(`"${modul.name}" modülü ve notları çöp kutusuna taşındı`);
+            ShowToast('"' + modul.name + '" modulu ve notlari cop kutusuna tasindi');
         }
     }
     
@@ -733,6 +1227,11 @@
         } else {
             aktifModulId = null;
         }
+        selectedCardId = null;
+        isConnectingMode = false;
+        connectingFromCard = null;
+        selectedNoteIds.clear();
+        if (isLineEditMode) DisableLineEditMode();
         RenderSidebar();
         RenderModuleTabs();
         RenderBoard();
@@ -741,6 +1240,11 @@
     
     function SetActiveModul(modulId) {
         aktifModulId = modulId;
+        selectedCardId = null;
+        isConnectingMode = false;
+        connectingFromCard = null;
+        selectedNoteIds.clear();
+        if (isLineEditMode) DisableLineEditMode();
         RenderModuleTabs();
         RenderBoard();
         SaveToDB();
@@ -752,7 +1256,7 @@
             const p = projeler[index];
             p.modules.forEach(modul => {
                 modul.notes.forEach(note => {
-                    trashBin.push({ id: nextTrashId++, type: 'not', name: note.title, parentName: `${p.name} / ${modul.name}`, deletedAt: new Date().toISOString(), originalData: note, parentId: p.id, parentType: 'proje', modulId: modul.id });
+                    trashBin.push({ id: nextTrashId++, type: 'not', name: note.title, parentName: p.name + " / " + modul.name, deletedAt: new Date().toISOString(), originalData: note, parentId: p.id, parentType: 'proje', modulId: modul.id });
                 });
                 trashBin.push({ id: nextTrashId++, type: 'modul', name: modul.name, parentName: p.name, deletedAt: new Date().toISOString(), originalData: { name: modul.name, notes: modul.notes }, parentId: p.id, parentType: 'proje' });
             });
@@ -763,11 +1267,12 @@
                 else if (fikirler.length > 0) SetActiveFikir(fikirler[0].id);
                 else { aktifTip = null; aktifId = null; aktifModulId = null; activeTitleSpan.innerText = "Ana Pano"; moduleTabsContainer.innerHTML = ''; RenderBoard(); }
             }
-            RenderSidebar(); SaveToDB(); ShowToast(`"${p.name}" projesi ve tüm modülleri çöp kutusuna taşındı`);
+            if (isLineEditMode) DisableLineEditMode();
+            RenderSidebar(); SaveToDB(); ShowToast('"' + p.name + '" projesi ve tum modulleri cop kutusuna tasindi');
         }
     }
     
-    // ORTAK NOT İŞLEMLERİ
+    // ORTAK NOT ISLEMLERI
     function GetCurrentNotes() {
         if (aktifTip === 'fikir') {
             const f = fikirler.find(fk => fk.id === aktifId);
@@ -782,7 +1287,7 @@
     }
     
     function AddNoteToActive() {
-        if (!aktifTip || !aktifId) { ShowToast("Önce bir fikir veya proje seçin", 1200); return; }
+        if (!aktifTip || !aktifId) { ShowToast("Once bir fikir veya proje secin", 1200); return; }
         const { left, top } = GetRandomPosition();
         const yeniNote = { id: nextNoteId++, title: "Yeni not", content: "Detaylar...", left, top, bgColor: "#1e293b" };
         
@@ -794,11 +1299,11 @@
             if (proje && aktifModulId) {
                 const modul = proje.modules.find(m => m.id === aktifModulId);
                 if (modul) modul.notes.push(yeniNote);
-                else { ShowToast("Önce bir modül seçin", 1000); return; }
+                else { ShowToast("Once bir modul secin", 1000); return; }
             }
         }
         RenderBoard(); 
-        RenderSidebar(); // Not sayısı güncelle
+        RenderSidebar();
         SaveToDB(); 
         ShowToast("Not eklendi", 1000);
     }
@@ -811,10 +1316,11 @@
                 if (index !== -1) {
                     const removed = f.notes.splice(index, 1)[0];
                     trashBin.push({ id: nextTrashId++, type: 'not', name: removed.title, parentName: f.name, deletedAt: new Date().toISOString(), originalData: removed, parentId: f.id, parentType: 'fikir' });
+                    RemoveConnectionsForNote(noteId);
                     RenderBoard(); 
-                    RenderSidebar(); // Not sayısı güncelle
+                    RenderSidebar();
                     SaveToDB(); 
-                    ShowToast("Not çöp kutusuna taşındı", 1000);
+                    ShowToast("Not cop kutusuna tasindi", 1000);
                 }
             }
         } else if (aktifTip === 'proje') {
@@ -825,18 +1331,108 @@
                     const index = modul.notes.findIndex(n => n.id === noteId);
                     if (index !== -1) {
                         const removed = modul.notes.splice(index, 1)[0];
-                        trashBin.push({ id: nextTrashId++, type: 'not', name: removed.title, parentName: `${proje.name} / ${modul.name}`, deletedAt: new Date().toISOString(), originalData: removed, parentId: proje.id, parentType: 'proje', modulId: modul.id });
+                        trashBin.push({ id: nextTrashId++, type: 'not', name: removed.title, parentName: proje.name + " / " + modul.name, deletedAt: new Date().toISOString(), originalData: removed, parentId: proje.id, parentType: 'proje', modulId: modul.id });
+                        RemoveConnectionsForNote(noteId);
                         RenderBoard(); 
-                        RenderSidebar(); // Not sayısı güncelle
+                        RenderSidebar();
                         SaveToDB(); 
-                        ShowToast("Not çöp kutusuna taşındı", 1000);
+                        ShowToast("Not cop kutusuna tasindi", 1000);
                     }
                 }
             }
         }
+        selectedNoteIds.delete(noteId);
     }
     
-    // ÇÖP KUTUSU GERİ YÜKLEME
+    function RemoveConnectionsForNote(noteId) {
+        const toDelete = connections.filter(c => c.from === noteId || c.to === noteId);
+        toDelete.forEach(c => {
+            delete lineColors[c.id];
+            delete lineWidths[c.id];
+            if (selectedLineIds.has(c.id)) selectedLineIds.delete(c.id);
+        });
+        connections = connections.filter(c => c.from !== noteId && c.to !== noteId);
+        RenderLines();
+        SaveToDB();
+    }
+    
+    // CIZGI BAGLANTI FONKSIYONLARI
+    function AddConnection(fromNoteId, toNoteId) {
+        if (fromNoteId === toNoteId) {
+            ShowToast("Ayni nota baglanti olusturamazsiniz", 1000);
+            return false;
+        }
+        const exists = connections.some(c => (c.from === fromNoteId && c.to === toNoteId) || (c.from === toNoteId && c.to === fromNoteId));
+        if (exists) {
+            ShowToast("Bu baglanti zaten var", 1000);
+            return false;
+        }
+        const newId = nextConnectionId++;
+        connections.push({ id: newId, from: fromNoteId, to: toNoteId });
+        RenderLines();
+        SaveToDB();
+        ShowToast("Baglanti olusturuldu", 800);
+        return true;
+    }
+    
+    function RemoveConnection(connectionId) {
+        connections = connections.filter(c => c.id !== connectionId);
+        delete lineColors[connectionId];
+        delete lineWidths[connectionId];
+        if (selectedLineIds.has(connectionId)) selectedLineIds.delete(connectionId);
+        RenderLines();
+        SaveToDB();
+        ShowToast("Baglanti kaldirildi", 800);
+    }
+    
+    function RenderLines() {
+        linesSvg.innerHTML = '';
+        connections.forEach(conn => {
+            const fromCard = document.querySelector(`.idea-card[data-note-id='${conn.from}']`);
+            const toCard = document.querySelector(`.idea-card[data-note-id='${conn.to}']`);
+            if (fromCard && toCard) {
+                const fromRect = fromCard.getBoundingClientRect();
+                const toRect = toCard.getBoundingClientRect();
+                const containerRect = notesContainer.getBoundingClientRect();
+                
+                const fromX = fromRect.left + fromRect.width / 2 - containerRect.left;
+                const fromY = fromRect.top + fromRect.height / 2 - containerRect.top;
+                const toX = toRect.left + toRect.width / 2 - containerRect.left;
+                const toY = toRect.top + toRect.height / 2 - containerRect.top;
+                
+                const lineColor = lineColors[conn.id] || '#60a5fa';
+                const lineWidth = lineWidths[conn.id] || 3;
+                const isSelected = isLineEditMode && selectedLineIds.has(conn.id);
+                
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', fromX);
+                line.setAttribute('y1', fromY);
+                line.setAttribute('x2', toX);
+                line.setAttribute('y2', toY);
+                line.setAttribute('stroke', lineColor);
+                line.setAttribute('stroke-width', isSelected ? lineWidth + 3 : lineWidth);
+                line.setAttribute('stroke-dasharray', '6, 4');
+                line.classList.add('connection-line');
+                line.style.cursor = 'pointer';
+                line.style.pointerEvents = 'stroke';
+                
+                line.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (isLineEditMode) {
+                        ToggleLineSelection(conn.id);
+                    } else {
+                        if (confirm('Bu baglantiyi silmek istiyor musunuz?')) {
+                            RemoveConnection(conn.id);
+                        }
+                    }
+                });
+                
+                linesSvg.appendChild(line);
+            }
+        });
+    }
+    
+    // COP KUTUSU
     function RestoreFromTrash(selectedIndices) {
         for (let i of selectedIndices.sort((a,b)=>b-a)) {
             const item = trashBin[i];
@@ -879,7 +1475,6 @@
             }
             trashBin.splice(i, 1);
         }
-        // Aktif görünümü güncelle
         if (aktifTip === 'fikir' && !fikirler.find(f=>f.id===aktifId)) {
             if (fikirler.length > 0) SetActiveFikir(fikirler[0].id);
             else if (projeler.length > 0) SetActiveProje(projeler[0].id);
@@ -893,11 +1488,11 @@
         SaveToDB();
     }
     
-    // RENDER FONKSİYONLARI
+    // RENDER FONKSIYONLARI
     function RenderSidebar() {
         fikirlerListDiv.innerHTML = '';
         if (fikirler.length === 0) {
-            const empty = document.createElement('div'); empty.className = 'empty-message'; empty.innerText = 'Henüz fikir yok';
+            const empty = document.createElement('div'); empty.className = 'empty-message'; empty.innerText = 'Henuz fikir yok';
             fikirlerListDiv.appendChild(empty);
         } else {
             fikirler.forEach(f => {
@@ -912,14 +1507,14 @@
         
         projelerListDiv.innerHTML = '';
         if (projeler.length === 0) {
-            const empty = document.createElement('div'); empty.className = 'empty-message'; empty.innerText = 'Henüz proje yok';
+            const empty = document.createElement('div'); empty.className = 'empty-message'; empty.innerText = 'Henuz proje yok';
             projelerListDiv.appendChild(empty);
         } else {
             projeler.forEach(p => {
                 const div = document.createElement('div'); div.className = 'list-item';
                 if (aktifTip === 'proje' && aktifId === p.id) div.classList.add('active-item');
                 const toplamNot = p.modules.reduce((acc, m) => acc + m.notes.length, 0);
-                div.innerHTML = `<span class="item-name">${EscapeHtml(p.name)} <span class="item-badge">${p.modules.length} modül, ${toplamNot} not</span></span><button class="delete-item" data-id="${p.id}">sil</button>`;
+                div.innerHTML = `<span class="item-name">${EscapeHtml(p.name)} <span class="item-badge">${p.modules.length} modul, ${toplamNot} not</span></span><button class="delete-item" data-id="${p.id}">sil</button>`;
                 div.addEventListener('click', (e) => { if (!e.target.classList.contains('delete-item')) SetActiveProje(p.id); });
                 div.querySelector('.delete-item').addEventListener('click', (e) => { e.stopPropagation(); DeleteProje(p.id); });
                 projelerListDiv.appendChild(div);
@@ -936,7 +1531,7 @@
             const btn = document.createElement('button');
             btn.className = 'module-tab';
             if (aktifModulId === mod.id) btn.classList.add('active-tab');
-            btn.innerHTML = `${EscapeHtml(mod.name)} <button class="delete-module-btn" data-id="${mod.id}">✕</button>`;
+            btn.innerHTML = `${EscapeHtml(mod.name)} <button class="delete-module-btn" data-id="${mod.id}">X</button>`;
             btn.onclick = (e) => { if (!e.target.classList.contains('delete-module-btn')) SetActiveModul(mod.id); };
             const delBtn = btn.querySelector('.delete-module-btn');
             delBtn.addEventListener('click', (e) => { e.stopPropagation(); DeleteModule(mod.id); });
@@ -944,86 +1539,240 @@
         });
         const addBtn = document.createElement('button');
         addBtn.className = 'add-module-btn';
-        addBtn.innerHTML = '+ Modül ekle';
+        addBtn.innerHTML = '+ Modul ekle';
         addBtn.onclick = () => AddNewModule();
         moduleTabsContainer.appendChild(addBtn);
+    }
+    
+    function SelectCard(cardElement, noteId) {
+        if (selectedNoteIds.has(noteId)) {
+            selectedNoteIds.delete(noteId);
+            cardElement.classList.remove('selected-card');
+        } else {
+            document.querySelectorAll('.idea-card').forEach(c => c.classList.remove('selected-card'));
+            selectedNoteIds.clear();
+            cardElement.classList.add('selected-card');
+            selectedCardId = noteId;
+            selectedNoteIds.add(noteId);
+        }
+        
+        if (isConnectingMode && connectingFromCard) {
+            if (connectingFromCard !== noteId) {
+                AddConnection(connectingFromCard, noteId);
+                isConnectingMode = false;
+                connectingFromCard = null;
+                document.querySelectorAll('.connector-btn').forEach(btn => btn.classList.remove('active-connector'));
+                cardElement.classList.remove('selected-card');
+                selectedCardId = null;
+                selectedNoteIds.clear();
+            } else {
+                ShowToast("Ayni nota baglanti yapamazsiniz", 800);
+                isConnectingMode = false;
+                connectingFromCard = null;
+                document.querySelectorAll('.connector-btn').forEach(btn => btn.classList.remove('active-connector'));
+            }
+        }
+    }
+    
+    function StartConnecting(noteId) {
+        isConnectingMode = true;
+        connectingFromCard = noteId;
+        document.querySelectorAll('.connector-btn').forEach(btn => btn.classList.remove('active-connector'));
+        const currentBtn = document.querySelector(`.connector-btn[data-connect-id='${noteId}']`);
+        if (currentBtn) currentBtn.classList.add('active-connector');
+        ShowToast("Baglanmak istediginiz nota tiklayin", 1500);
     }
     
     function RenderBoard() {
         notesContainer.innerHTML = '';
         if (!aktifTip || !aktifId) {
-            notesContainer.innerHTML = '<div style="color:#5a6e85; text-align:center; margin-top:80px;">Bir fikir veya proje seçin</div>';
+            notesContainer.innerHTML = '<div style="color:#5a6e85; text-align:center; margin-top:80px;">Bir fikir veya proje secin</div>';
             return;
         }
         
+        let notes = [];
         if (aktifTip === 'fikir') {
             const f = fikirler.find(fk => fk.id === aktifId);
-            if (!f) { notesContainer.innerHTML = '<div style="color:#5a6e85; text-align:center; margin-top:80px;">Fikir bulunamadı</div>'; return; }
-            if (f.notes.length === 0) { notesContainer.innerHTML = '<div style="color:#5a6e85; text-align:center; margin-top:80px;">Not eklemek için "+ Not Ekle" butonuna tıklayın</div>'; return; }
-            f.notes.forEach(note => RenderNoteCard(note));
+            if (!f) { notesContainer.innerHTML = '<div style="color:#5a6e85; text-align:center; margin-top:80px;">Fikir bulunamadi</div>'; return; }
+            notes = f.notes;
         } else if (aktifTip === 'proje') {
             const proje = projeler.find(p => p.id === aktifId);
-            if (!proje) { notesContainer.innerHTML = '<div style="color:#5a6e85; text-align:center; margin-top:80px;">Proje bulunamadı</div>'; return; }
+            if (!proje) { notesContainer.innerHTML = '<div style="color:#5a6e85; text-align:center; margin-top:80px;">Proje bulunamadi</div>'; return; }
             if (!aktifModulId || !proje.modules.find(m => m.id === aktifModulId)) {
                 if (proje.modules.length > 0) { aktifModulId = proje.modules[0].id; RenderModuleTabs(); }
-                else { notesContainer.innerHTML = '<div style="color:#5a6e85; text-align:center; margin-top:80px;">Modül eklemek için "+ Modül ekle" butonuna tıklayın</div>'; return; }
+                else { notesContainer.innerHTML = '<div style="color:#5a6e85; text-align:center; margin-top:80px;">Modul eklemek icin "+ Modul ekle" butonuna tiklayin</div>'; return; }
             }
             const modul = proje.modules.find(m => m.id === aktifModulId);
-            if (modul.notes.length === 0) { notesContainer.innerHTML = '<div style="color:#5a6e85; text-align:center; margin-top:80px;">Not eklemek için "+ Not Ekle" butonuna tıklayın</div>'; return; }
-            modul.notes.forEach(note => RenderNoteCard(note));
+            notes = modul.notes;
         }
+        
+        if (notes.length === 0) {
+            notesContainer.innerHTML = '<div style="color:#5a6e85; text-align:center; margin-top:80px;">Not eklemek icin "+ Not Ekle" butonuna tiklayin</div>';
+            return;
+        }
+        
+        notes.forEach(note => RenderNoteCard(note));
+        setTimeout(() => RenderLines(), 50);
     }
     
     function RenderNoteCard(note) {
-        const card = document.createElement('div'); card.className = 'idea-card'; card.setAttribute('data-note-id', note.id);
-        card.style.left = note.left + 'px'; card.style.top = note.top + 'px'; card.style.backgroundColor = note.bgColor || "#1e293b";
-        card.innerHTML = `<div class="card-header"><span class="drag-area">⋮⋮</span><input type="text" class="card-title" value="${EscapeHtml(note.title)}" placeholder="Başlık"><button class="delete-card">✕</button></div><textarea class="card-content" placeholder="Not detayı...">${EscapeHtml(note.content)}</textarea><div class="color-selector" id="ColorSelector-${note.id}"></div>`;
-        const titleInp = card.querySelector('.card-title'); const contentArea = card.querySelector('.card-content'); const delBtn = card.querySelector('.delete-card');
-        titleInp.addEventListener('change', () => { note.title = titleInp.value; SaveToDB(); });
-        contentArea.addEventListener('change', () => { note.content = contentArea.value; SaveToDB(); });
-        delBtn.addEventListener('click', (e) => { e.stopPropagation(); DeleteNote(note.id); });
+        const card = document.createElement('div'); 
+        card.className = 'idea-card'; 
+        card.setAttribute('data-note-id', note.id);
+        card.style.left = note.left + 'px'; 
+        card.style.top = note.top + 'px'; 
+        card.style.backgroundColor = note.bgColor || "#1e293b";
+        
+        if (selectedNoteIds.has(note.id)) {
+            card.classList.add('selected-card');
+        }
+        
+        card.innerHTML = `
+            <div class="card-header">
+                <span class="drag-area">::</span>
+                <input type="text" class="card-title" value="${EscapeHtml(note.title)}" placeholder="Baslik">
+                <button class="connector-btn" data-connect-id="${note.id}">+</button>
+                <button class="delete-card">X</button>
+            </div>
+            <textarea class="card-content" placeholder="Not detayi...">${EscapeHtml(note.content)}</textarea>
+            <div class="color-selector" id="ColorSelector-${note.id}"></div>
+        `;
+        
+        const connectionPoints = ['top', 'bottom', 'left', 'right'];
+        connectionPoints.forEach(pos => {
+            const point = document.createElement('div');
+            point.className = `connection-point ${pos}`;
+            point.title = pos + " baglanti noktasi";
+            point.addEventListener('click', (e) => {
+                e.stopPropagation();
+                StartConnecting(note.id);
+            });
+            card.appendChild(point);
+        });
+        
+        const titleInp = card.querySelector('.card-title'); 
+        const contentArea = card.querySelector('.card-content'); 
+        const delBtn = card.querySelector('.delete-card');
+        const connectorBtn = card.querySelector('.connector-btn');
+        
+        connectorBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            StartConnecting(note.id);
+        });
+        
+        titleInp.addEventListener('change', () => { 
+            note.title = titleInp.value; 
+            SaveToDB();
+            RenderLines();
+        });
+        
+        contentArea.addEventListener('change', () => { 
+            note.content = contentArea.value; 
+            SaveToDB();
+        });
+        
+        delBtn.addEventListener('click', (e) => { 
+            e.stopPropagation(); 
+            DeleteNote(note.id); 
+        });
+        
         const colorDiv = card.querySelector(`#ColorSelector-${note.id}`);
         colorPalette.forEach(color => {
-            const dot = document.createElement('div'); dot.className = 'color-option'; dot.style.backgroundColor = color;
+            const dot = document.createElement('div'); 
+            dot.className = 'color-option'; 
+            dot.style.backgroundColor = color;
             dot.style.border = note.bgColor === color ? '2px solid white' : '1px solid rgba(255,255,255,0.3)';
-            dot.addEventListener('click', (e) => { e.stopPropagation(); note.bgColor = color; card.style.backgroundColor = color; colorDiv.querySelectorAll('.color-option').forEach(d => d.style.border = d.style.backgroundColor === color ? '2px solid white' : '1px solid rgba(255,255,255,0.3)'); SaveToDB(); ShowToast("Renk değiştirildi", 800); });
+            dot.addEventListener('click', (e) => { 
+                e.stopPropagation(); 
+                note.bgColor = color; 
+                card.style.backgroundColor = color; 
+                colorDiv.querySelectorAll('.color-option').forEach(d => d.style.border = d.style.backgroundColor === color ? '2px solid white' : '1px solid rgba(255,255,255,0.3)'); 
+                SaveToDB(); 
+                ShowToast("Renk degistirildi", 800); 
+            });
             colorDiv.appendChild(dot);
         });
-        card.addEventListener('mousedown', (e) => { if (e.target.classList.contains('delete-card') || e.target.classList.contains('card-title') || e.target.classList.contains('card-content') || e.target.classList.contains('color-option')) return; e.preventDefault(); StartDrag(e, card, note); });
+        
+        card.addEventListener('click', (e) => {
+            if (!e.target.classList.contains('delete-card') && 
+                !e.target.classList.contains('connector-btn') &&
+                !e.target.classList.contains('color-option') &&
+                !e.target.classList.contains('connection-point')) {
+                SelectCard(card, note.id);
+            }
+        });
+        
+        card.addEventListener('mousedown', (e) => { 
+            if (e.target.classList.contains('delete-card') || 
+                e.target.classList.contains('card-title') || 
+                e.target.classList.contains('card-content') || 
+                e.target.classList.contains('color-option') ||
+                e.target.classList.contains('connector-btn') ||
+                e.target.classList.contains('connection-point')) return; 
+            e.preventDefault(); 
+            StartDrag(e, card, note); 
+        });
+        
         notesContainer.appendChild(card);
     }
     
     let DragActive = false, DragCard = null, DragNote = null, StartX, StartY, StartLeft, StartTop;
     function StartDrag(e, cardElement, noteObj) {
-        const rect = cardElement.getBoundingClientRect(); const containerRect = notesContainer.getBoundingClientRect();
-        DragActive = true; DragCard = cardElement; DragNote = noteObj;
-        StartX = e.clientX; StartY = e.clientY; StartLeft = rect.left - containerRect.left; StartTop = rect.top - containerRect.top;
-        document.body.style.userSelect = 'none'; cardElement.style.cursor = 'grabbing';
+        const rect = cardElement.getBoundingClientRect(); 
+        const containerRect = notesContainer.getBoundingClientRect();
+        DragActive = true; 
+        DragCard = cardElement; 
+        DragNote = noteObj;
+        StartX = e.clientX; 
+        StartY = e.clientY; 
+        StartLeft = rect.left - containerRect.left; 
+        StartTop = rect.top - containerRect.top;
+        document.body.style.userSelect = 'none'; 
+        cardElement.style.cursor = 'grabbing';
+        
         const onMove = (moveEvent) => {
-            if (!DragActive) return; moveEvent.preventDefault();
+            if (!DragActive) return; 
+            moveEvent.preventDefault();
             let dx = moveEvent.clientX - StartX, dy = moveEvent.clientY - StartY;
             let newLeft = StartLeft + dx, newTop = StartTop + dy;
             const parentRect = notesContainer.getBoundingClientRect();
             const maxX = parentRect.width - DragCard.offsetWidth, maxY = parentRect.height - DragCard.offsetHeight;
             newLeft = Math.min(Math.max(newLeft, 5), Math.max(maxX, 5));
             newTop = Math.min(Math.max(newTop, 5), Math.max(maxY, 5));
-            DragCard.style.left = newLeft + 'px'; DragCard.style.top = newTop + 'px';
-            if (DragNote) { DragNote.left = newLeft; DragNote.top = newTop; }
+            DragCard.style.left = newLeft + 'px'; 
+            DragCard.style.top = newTop + 'px';
+            if (DragNote) { 
+                DragNote.left = newLeft; 
+                DragNote.top = newTop; 
+            }
+            RenderLines();
         };
-        const onUp = () => { if (DragActive) { DragActive = false; document.body.style.userSelect = ''; if (DragCard) DragCard.style.cursor = 'grab'; document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); SaveToDB(); } };
-        document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
+        
+        const onUp = () => { 
+            if (DragActive) { 
+                DragActive = false; 
+                document.body.style.userSelect = ''; 
+                if (DragCard) DragCard.style.cursor = 'grab'; 
+                document.removeEventListener('mousemove', onMove); 
+                document.removeEventListener('mouseup', onUp); 
+                SaveToDB(); 
+                RenderLines();
+            } 
+        };
+        document.addEventListener('mousemove', onMove); 
+        document.addEventListener('mouseup', onUp);
     }
     
     function ShowTrashModal() {
         if (trashBin.length === 0) {
             const modal = document.createElement('div'); modal.className = 'modal-overlay';
-            modal.innerHTML = `<div class="modal-container"><h3>Çöp Kutusu</h3><div class="empty-trash">Çöp kutusu boş</div><div class="modal-buttons"><button class="modal-btn modal-btn-cancel" id="CloseModal">Kapat</button></div></div>`;
+            modal.innerHTML = `<div class="modal-container"><h3>Cop Kutusu</h3><div class="empty-trash">Cop kutusu bos</div><div class="modal-buttons"><button class="modal-btn modal-btn-cancel" id="CloseModal">Kapat</button></div></div>`;
             document.body.appendChild(modal);
             modal.querySelector('#CloseModal').onclick = () => modal.remove();
             return;
         }
         const modal = document.createElement('div'); modal.className = 'modal-overlay';
-        modal.innerHTML = `<div class="modal-container" style="width: 500px;"><h3>Çöp Kutusu</h3><div class="trash-list" id="TrashListModal"></div><div class="modal-buttons" style="justify-content: space-between;"><div><button class="modal-btn modal-btn-cancel" id="SelectAllBtn">Tümünü Seç</button></div><div style="display: flex; gap: 8px;"><button class="modal-btn modal-btn-confirm" id="RestoreSelectedBtn">Geri Yükle</button><button class="modal-btn modal-btn-danger" id="DeleteSelectedBtn">Kalıcı Sil</button><button class="modal-btn modal-btn-cancel" id="CloseTrashBtn">Kapat</button></div></div></div>`;
+        modal.innerHTML = `<div class="modal-container" style="width: 550px;"><h3>Cop Kutusu</h3><div class="trash-list" id="TrashListModal"></div><div class="modal-buttons" style="justify-content: space-between;"><div><button class="modal-btn modal-btn-cancel" id="SelectAllBtn">Tumunu Sec</button></div><div style="display: flex; gap: 8px;"><button class="modal-btn modal-btn-confirm" id="RestoreSelectedBtn">Geri Yukle</button><button class="modal-btn modal-btn-danger" id="DeleteSelectedBtn">Kalici Sil</button><button class="modal-btn modal-btn-cancel" id="CloseTrashBtn">Kapat</button></div></div></div>`;
         document.body.appendChild(modal);
         const listDiv = modal.querySelector('#TrashListModal');
         let selected = new Array(trashBin.length).fill(false);
@@ -1031,7 +1780,7 @@
             listDiv.innerHTML = '';
             trashBin.forEach((item, idx) => {
                 const div = document.createElement('div'); div.className = 'trash-item'; if (selected[idx]) div.classList.add('selected');
-                div.innerHTML = `<input type="checkbox" class="trash-checkbox" ${selected[idx] ? 'checked' : ''}><div class="trash-info"><div class="trash-name">${EscapeHtml(item.name)}</div><div class="trash-meta"><span class="trash-badge">${item.type}</span> • ${item.parentName} • ${new Date(item.deletedAt).toLocaleDateString()}</div></div>`;
+                div.innerHTML = `<input type="checkbox" class="trash-checkbox" ${selected[idx] ? 'checked' : ''}><div class="trash-info"><div class="trash-name">${EscapeHtml(item.name)}</div><div class="trash-meta"><span class="trash-badge">${item.type}</span> - ${item.parentName} - ${new Date(item.deletedAt).toLocaleDateString()}</div></div>`;
                 const chk = div.querySelector('.trash-checkbox');
                 chk.onchange = (e) => { selected[idx] = e.target.checked; if (e.target.checked) div.classList.add('selected'); else div.classList.remove('selected'); };
                 div.onclick = (e) => { if (e.target !== chk) { chk.checked = !chk.checked; selected[idx] = chk.checked; if (chk.checked) div.classList.add('selected'); else div.classList.remove('selected'); } };
@@ -1042,17 +1791,17 @@
         modal.querySelector('#SelectAllBtn').onclick = () => { selected.fill(true); RenderList(); };
         modal.querySelector('#RestoreSelectedBtn').onclick = () => {
             const indices = selected.map((v, i) => v ? i : -1).filter(i => i !== -1);
-            if (indices.length === 0) { ShowToast("Lütfen öğe seçin", 1000); return; }
+            if (indices.length === 0) { ShowToast("Lutfen oge secin", 1000); return; }
             RestoreFromTrash(indices);
             modal.remove(); 
-            ShowToast(`${indices.length} öğe geri yüklendi`, 1500);
+            ShowToast(indices.length + " oge geri yuklendi", 1500);
         };
         modal.querySelector('#DeleteSelectedBtn').onclick = () => {
             const indices = selected.map((v, i) => v ? i : -1).filter(i => i !== -1).reverse();
-            if (indices.length === 0) { ShowToast("Lütfen öğe seçin", 1000); return; }
-            if (confirm(`${indices.length} öğeyi kalıcı olarak silmek istiyor musunuz?`)) {
+            if (indices.length === 0) { ShowToast("Lutfen oge secin", 1000); return; }
+            if (confirm(indices.length + " ogeyi kalici olarak silmek istiyor musunuz?")) {
                 indices.forEach(i => trashBin.splice(i, 1));
-                SaveToDB(); modal.remove(); ShowToast(`${indices.length} öğe kalıcı olarak silindi`, 1500);
+                SaveToDB(); modal.remove(); ShowToast(indices.length + " oge kalici olarak silindi", 1500);
             }
         };
         modal.querySelector('#CloseTrashBtn').onclick = () => modal.remove();
@@ -1064,9 +1813,32 @@
     document.getElementById('AddProjeBtn').addEventListener('click', AddNewProje);
     document.getElementById('AddNoteToActiveBtn').addEventListener('click', AddNoteToActive);
     document.getElementById('TrashBinBtn').addEventListener('click', ShowTrashModal);
+    document.getElementById('EnableLineEditBtn').addEventListener('click', EnableLineEditMode);
     
-    async function StartApp() { await InitDB(); await LoadFromDB(); RenderSidebar(); RenderModuleTabs(); if (aktifTip === 'fikir' && fikirler.find(f=>f.id===aktifId)) SetActiveFikir(aktifId); else if (aktifTip === 'proje' && projeler.find(p=>p.id===aktifId)) SetActiveProje(aktifId); else if (fikirler.length > 0) SetActiveFikir(fikirler[0].id); else if (projeler.length > 0) SetActiveProje(projeler[0].id); else RenderBoard(); window.addEventListener('resize', () => RenderBoard()); }
+    window.addEventListener('resize', () => {
+        RenderBoard();
+        setTimeout(() => RenderLines(), 100);
+    });
+    
+    async function StartApp() { 
+        await InitDB(); 
+        await LoadFromDB(); 
+        RenderSidebar(); 
+        RenderModuleTabs(); 
+        RenderLineEditorBar();
+        initSelection();
+        if (aktifTip === 'fikir' && fikirler.find(f=>f.id===aktifId)) SetActiveFikir(aktifId); 
+        else if (aktifTip === 'proje' && projeler.find(p=>p.id===aktifId)) SetActiveProje(aktifId); 
+        else if (fikirler.length > 0) SetActiveFikir(fikirler[0].id); 
+        else if (projeler.length > 0) SetActiveProje(projeler[0].id); 
+        else RenderBoard(); 
+    }
     StartApp();
 </script>
 </body>
 </html>
+
+<!-- tümünü seçmeye çalıştığımda çizgileri de seçsin ayrı olduğunda, sadece kart değil her şey için seçsin yani -->
+<!-- çöp kutusunda fikir proje modül ayrımı yapılsın neyin ne olduğunu göremiyorum -->
+<!-- ctrl z ile işlemler geri alınabilsin -->
+<!-- düzenlemeleri kaydet seçeneği gelsin -->
