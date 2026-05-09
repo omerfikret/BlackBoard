@@ -1,686 +1,440 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>BlackBoard</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>BlackBoard</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; user-select:none; }
 
-        body {
-            background: #0a0a0f;
-            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
-            height: 100vh;
-            overflow: hidden;
-        }
+body {
+    background:#0a0a0f;
+    font-family:'Segoe UI','Inter',system-ui,-apple-system,sans-serif;
+    height:100vh; overflow:hidden;
+}
 
-        .app-layout {
-            display: flex;
-            height: 100vh;
-            width: 100%;
-        }
+.app-layout { display:flex; height:100vh; width:100%; }
 
-        /* Sidebar Styles */
-        .sidebar {
-            width: 320px;
-            background: #0f1117;
-            border-right: 1px solid #1e2a3a;
-            display: flex;
-            flex-direction: column;
-            z-index: 20;
-            flex-shrink: 0;
-        }
+/* ─── SIDEBAR ─── */
+.sidebar {
+    width:300px; background:#0f1117;
+    border-right:1px solid #1e2a3a;
+    display:flex; flex-direction:column; z-index:20; flex-shrink:0;
+}
+.sidebar-header { padding:20px 16px 16px; border-bottom:1px solid #1e2f3f; }
+.sidebar-header h2 { color:#fff; font-size:1.4rem; font-weight:600; letter-spacing:-0.3px; }
+.save-indicator {
+    font-size:0.65rem; margin-top:4px; display:flex; align-items:center; gap:5px; height:16px;
+}
+.save-dot { width:6px; height:6px; border-radius:50%; background:#22c55e; }
+.save-dot.unsaved { background:#f59e0b; animation:pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.save-text { color:#5f7f9e; font-size:0.65rem; }
 
-        .sidebar-header {
-            padding: 24px 20px;
-            border-bottom: 1px solid #1e2f3f;
-        }
+.create-buttons { padding:14px 12px; display:flex; flex-direction:column; gap:8px; border-bottom:1px solid #1e2a3a; }
+.create-btn {
+    background:#0f2b3f; border:none; padding:9px 14px; border-radius:10px;
+    display:flex; align-items:center; gap:8px; font-size:0.82rem; font-weight:500;
+    color:#e2e8f0; cursor:pointer; transition:all 0.2s; width:100%; text-align:left;
+    font-family:inherit; border-left:3px solid #3b82f6;
+}
+.create-btn:hover { background:#1e3a5f; color:#fff; }
 
-        .sidebar-header h2 {
-            color: #ffffff;
-            font-size: 1.5rem;
-            font-weight: 600;
-            letter-spacing: -0.3px;
-        }
+.lists-container { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:20px; }
+.list-section { display:flex; flex-direction:column; gap:7px; }
+.section-label { color:#5f7f9e; font-size:0.68rem; font-weight:600; padding-left:6px; letter-spacing:0.5px; }
+.items-list { display:flex; flex-direction:column; gap:5px; }
 
-        .create-buttons {
-            padding: 20px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            border-bottom: 1px solid #1e2a3a;
-        }
+.list-item {
+    background:#11161f; border-radius:10px; padding:9px 11px;
+    cursor:pointer; transition:all 0.15s; border:1px solid #1e2a3a;
+    display:flex; justify-content:space-between; align-items:flex-start;
+}
+.list-item:hover { background:#16212b; border-color:#2c4c6e; }
+.list-item.active-item { background:#0a1a2a; border-left:3px solid #3b82f6; }
 
-        .create-btn {
-            background: #0f2b3f;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #e2e8f0;
-            cursor: pointer;
-            transition: all 0.2s;
-            width: 100%;
-            text-align: left;
-            font-family: inherit;
-            border-left: 3px solid #3b82f6;
-        }
+.item-name {
+    color:#e2e8f0; font-size:0.82rem; font-weight:500;
+    word-break:break-word; flex:1; display:flex; flex-direction:column; gap:3px;
+}
+.item-badge {
+    font-size:0.6rem; background:#1e2a3a; padding:2px 6px;
+    border-radius:20px; color:#8ba0bc; display:inline-block; width:fit-content;
+}
+.item-actions { display:flex; gap:4px; flex-shrink:0; margin-left:6px; }
+.item-action-btn {
+    background:none; border:none; color:#7f8c9a; cursor:pointer;
+    font-size:0.72rem; padding:3px 6px; border-radius:6px; opacity:0.7;
+    font-family:inherit; white-space:nowrap;
+}
+.item-action-btn:hover { background:#1e3a5f; color:#7ab7ef; opacity:1; }
+.item-action-btn.danger:hover { background:#b91c1c30; color:#f87171; }
 
-        .create-btn:hover {
-            background: #1e3a5f;
-            color: white;
-        }
+.empty-message { color:#5a6e85; font-size:0.75rem; padding:10px; text-align:center; }
 
-        .lists-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
+.trash-section { margin-top:12px; border-top:1px solid #1e2a3a; padding-top:12px; }
+.trash-btn {
+    background:#1a1118; border:none; padding:9px 14px; border-radius:10px;
+    display:flex; align-items:center; gap:8px; font-size:0.82rem; font-weight:500;
+    color:#c08484; cursor:pointer; width:100%; font-family:inherit;
+}
+.trash-btn:hover { background:#2a1a22; color:#ffaaaa; }
 
-        .list-section {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
+/* ─── MAIN BOARD ─── */
+.main-board { flex:1; background:#0a0a0f; display:flex; flex-direction:column; overflow:hidden; }
 
-        .section-label {
-            color: #5f7f9e;
-            font-size: 0.7rem;
-            font-weight: 600;
-            padding-left: 8px;
-            letter-spacing: 0.5px;
-        }
+.board-header {
+    padding:13px 22px;
+    background:rgba(10,10,15,0.97);
+    border-bottom:1px solid #1f2c38;
+    flex-shrink:0;
+}
+.header-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.active-info h3 { color:#f1f5f9; font-size:1rem; font-weight:500; }
 
-        .items-list {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
+.board-actions { display:flex; gap:7px; flex-wrap:wrap; align-items:center; }
+.action-btn {
+    background:#11161f; border:none; padding:7px 16px; border-radius:30px;
+    color:#e2e8f0; font-weight:500; cursor:pointer; font-size:0.78rem;
+    font-family:inherit; transition:all 0.2s; border:1px solid #1e2a3a;
+}
+.action-btn:hover { background:#1e3a5f; border-color:#3b82f6; }
+.action-btn.primary { background:#1e3a5f; border-color:#3b82f6; color:#7ab7ef; }
+.action-btn.danger { background:#2a1a1a; border-color:#7f1d1d; color:#f87171; }
+.action-btn.warn { background:#2a2010; border-color:#78350f; color:#fbbf24; }
 
-        .list-item {
-            background: #11161f;
-            border-radius: 10px;
-            padding: 10px 12px;
-            cursor: pointer;
-            transition: all 0.15s;
-            border: 1px solid #1e2a3a;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+/* Line Editor */
+.line-editor-bar {
+    background:#0f2b3f; border-radius:10px; padding:7px 14px;
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-top:8px;
+}
+.line-editor-label { color:#7ab7ef; font-size:0.72rem; font-weight:600; }
+.color-picker-group { display:flex; gap:6px; align-items:center; }
+.line-color-option { width:22px; height:22px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:0.1s; }
+.line-color-option:hover { transform:scale(1.15); border-color:#fff; }
+.stroke-btn { background:#1e2a3a; border:none; padding:3px 10px; border-radius:20px; color:#fff; font-size:0.68rem; cursor:pointer; font-family:inherit; }
+.stroke-btn:hover { background:#3b82f6; }
+.line-action-btn { background:#2a1a22; border:none; padding:3px 10px; border-radius:20px; color:#f08b8b; font-size:0.68rem; cursor:pointer; font-family:inherit; }
+.line-action-btn:hover { background:#b91c1c; color:#fff; }
+.close-editor-btn { background:#1e2a3a; border:none; padding:3px 10px; border-radius:20px; color:#a0b3d0; font-size:0.68rem; cursor:pointer; font-family:inherit; margin-left:auto; }
+.close-editor-btn:hover { background:#3b82f6; color:#fff; }
+.selection-info { color:#60a5fa; font-size:0.68rem; background:#1e3a5f; padding:3px 9px; border-radius:20px; }
 
-        .list-item:hover {
-            background: #16212b;
-            border-color: #2c4c6e;
-        }
+/* Module tabs */
+.module-tabs { display:flex; gap:7px; flex-wrap:wrap; margin-top:8px; align-items:center; }
+.module-tab {
+    background:#11161f; border:none; padding:5px 13px; border-radius:20px;
+    color:#a0b3d0; font-size:0.73rem; cursor:pointer; transition:0.2s;
+    display:inline-flex; align-items:center; gap:7px; font-family:inherit;
+}
+.module-tab:hover { background:#1e2a3a; color:#fff; }
+.module-tab.active-tab { background:#1e3a5f; color:#fff; }
+.delete-module-btn {
+    background:none; border:none; color:#7f8c9a; cursor:pointer;
+    font-size:0.68rem; padding:1px 5px; border-radius:10px; opacity:0.7;
+}
+.delete-module-btn:hover { background:#b91c1c30; color:#f87171; opacity:1; }
+.add-module-btn {
+    background:#0f2b3f; border:none; padding:5px 11px; border-radius:20px;
+    color:#7ab7ef; font-size:0.7rem; cursor:pointer; display:flex;
+    align-items:center; gap:4px; font-family:inherit;
+}
 
-        .list-item.active-item {
-            background: #0a1a2a;
-            border-left: 3px solid #3b82f6;
-        }
+/* ─── CANVAS ─── */
+.whiteboard-canvas {
+    flex:1; position:relative; overflow:hidden;
+    background:#070709;
+    background-image:linear-gradient(rgba(59,130,246,0.04) 1px,transparent 1px),
+                    linear-gradient(90deg,rgba(59,130,246,0.04) 1px,transparent 1px);
+    background-size:28px 28px;
+    cursor:default;
+}
+.notes-container { position:relative; width:100%; height:100%; overflow:visible; }
+.selection-rect { position:absolute; border:2px solid #3b82f6; background:rgba(59,130,246,0.1); pointer-events:none; z-index:200; display:none; }
 
-        .item-name {
-            color: #e2e8f0;
-            font-size: 0.85rem;
-            font-weight: 500;
-            word-break: break-word;
-            flex: 1;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+/* ─── CARDS ─── */
+.idea-card {
+    position:absolute; width:260px;
+    background:#141a24; border-radius:14px; padding:0;
+    box-shadow:0 6px 18px rgba(0,0,0,0.4);
+    cursor:grab; border:1px solid rgba(59,130,246,0.25);
+    transition:box-shadow 0.2s; z-index:10; overflow:hidden;
+}
+.idea-card:active { cursor:grabbing; }
+.idea-card.selected-card { box-shadow:0 0 0 2px #3b82f6, 0 6px 18px rgba(0,0,0,0.4); z-index:100; }
 
-        .item-badge {
-            font-size: 0.65rem;
-            background: #1e2a3a;
-            padding: 2px 6px;
-            border-radius: 20px;
-            color: #8ba0bc;
-        }
+.card-titlebar {
+    display:flex; align-items:center; gap:6px;
+    padding:9px 10px 8px; border-bottom:1px solid #1e2a3a;
+    background:#101520;
+}
+.drag-area { cursor:grab; color:#5a6e8a; font-size:13px; padding:0 2px; user-select:none; flex-shrink:0; }
+.card-title {
+    font-weight:600; font-size:0.82rem; background:transparent; border:none;
+    color:#f0f4fe; flex:1; padding:2px 0; font-family:inherit;
+    border-bottom:1px dashed transparent;
+}
+.card-title:focus { outline:none; border-bottom-color:#3b82f6; }
+.card-type-badge {
+    font-size:0.58rem; background:#1e2a3a; padding:1px 6px;
+    border-radius:10px; color:#8ba0bc; flex-shrink:0;
+}
+.connector-btn {
+    cursor:pointer; background:#1e3a5f; width:22px; height:22px;
+    border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:12px; transition:all 0.2s; flex-shrink:0; border:none; color:#7ab7ef;
+}
+.connector-btn:hover { background:#3b82f6; color:#fff; }
+.connector-btn.active-connector { background:#f59e0b; box-shadow:0 0 8px #f59e0b; color:#000; }
+.delete-card {
+    background:none; border:none; color:#5a6e8a; width:20px; height:20px;
+    border-radius:20px; cursor:pointer; font-size:11px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+}
+.delete-card:hover { background:#7f1d1d; color:#fff; }
 
-        .delete-item {
-            background: none;
-            border: none;
-            color: #7f8c9a;
-            cursor: pointer;
-            font-size: 1rem;
-            padding: 4px 8px;
-            border-radius: 6px;
-            opacity: 0.6;
-        }
+/* Card body: blocks */
+.card-body { padding:8px; display:flex; flex-direction:column; gap:5px; min-height:40px; }
 
-        .delete-item:hover {
-            background: #b91c1c30;
-            color: #f87171;
-            opacity: 1;
-        }
+/* Blocks inside card */
+.block { position:relative; border-radius:8px; overflow:hidden; }
 
-        .empty-message {
-            color: #5a6e85;
-            font-size: 0.75rem;
-            padding: 12px;
-            text-align: center;
-        }
+.block-text textarea {
+    width:100%; background:#0f131c; border:none; color:#cbd5e6;
+    font-size:0.74rem; font-family:inherit; resize:vertical;
+    padding:7px 8px; border-radius:8px; min-height:50px;
+    line-height:1.5;
+}
+.block-text textarea:focus { outline:none; background:#1a2230; }
 
-        .trash-section {
-            margin-top: 16px;
-            border-top: 1px solid #1e2a3a;
-            padding-top: 16px;
-        }
+.block-checklist { background:#0d1520; border-radius:8px; padding:6px 8px; }
+.checklist-item {
+    display:flex; align-items:flex-start; gap:7px; padding:3px 0;
+    border-bottom:1px solid #1e2a3a30;
+}
+.checklist-item:last-child { border-bottom:none; }
+.checklist-cb { width:14px; height:14px; accent-color:#3b82f6; cursor:pointer; margin-top:1px; flex-shrink:0; }
+.checklist-label {
+    flex:1; font-size:0.73rem; color:#cbd5e6; background:transparent;
+    border:none; font-family:inherit; padding:0;
+}
+.checklist-label:focus { outline:none; }
+.checklist-label.done { text-decoration:line-through; color:#5a6e85; }
+.checklist-del { background:none; border:none; color:#5a6e85; cursor:pointer; font-size:10px; padding:0 3px; }
+.checklist-del:hover { color:#f87171; }
+.add-checklist-item {
+    width:100%; background:none; border:none; color:#5a6e85; font-size:0.68rem;
+    cursor:pointer; text-align:left; padding:4px 2px; font-family:inherit;
+    margin-top:2px;
+}
+.add-checklist-item:hover { color:#7ab7ef; }
 
-        .trash-btn {
-            background: #1a1118;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #c08484;
-            cursor: pointer;
-            width: 100%;
-            font-family: inherit;
-        }
+.block-steps { background:#0d1520; border-radius:8px; padding:6px 8px; }
+.step-item {
+    display:flex; align-items:flex-start; gap:8px; padding:4px 0;
+    border-bottom:1px solid #1e2a3a30;
+}
+.step-item:last-child { border-bottom:none; }
+.step-num {
+    width:18px; height:18px; background:#1e3a5f; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:0.6rem; color:#7ab7ef; font-weight:700; flex-shrink:0; margin-top:1px;
+}
+.step-text {
+    flex:1; font-size:0.73rem; color:#cbd5e6; background:transparent;
+    border:none; font-family:inherit; padding:0; resize:none; min-height:20px;
+}
+.step-text:focus { outline:none; }
+.step-del { background:none; border:none; color:#5a6e85; cursor:pointer; font-size:10px; padding:0 3px; }
+.step-del:hover { color:#f87171; }
+.add-step-item {
+    width:100%; background:none; border:none; color:#5a6e85; font-size:0.68rem;
+    cursor:pointer; text-align:left; padding:4px 2px; font-family:inherit; margin-top:2px;
+}
+.add-step-item:hover { color:#7ab7ef; }
 
-        .trash-btn:hover {
-            background: #2a1a22;
-            color: #ffaaaa;
-        }
+.block-code { background:#060a10; border-radius:8px; overflow:hidden; }
+.code-lang-bar {
+    background:#0f1824; padding:4px 8px; display:flex;
+    justify-content:space-between; align-items:center;
+}
+.code-lang-select {
+    background:transparent; border:none; color:#7ab7ef; font-size:0.68rem;
+    font-family:inherit; cursor:pointer;
+}
+.code-copy-btn {
+    background:none; border:none; color:#5a6e85; font-size:0.65rem;
+    cursor:pointer; font-family:inherit; padding:2px 6px; border-radius:4px;
+}
+.code-copy-btn:hover { background:#1e3a5f; color:#7ab7ef; }
+.block-code textarea {
+    width:100%; background:#060a10; border:none; color:#a8d8b8;
+    font-size:0.72rem; font-family:'Courier New',monospace; resize:vertical;
+    padding:8px; min-height:60px; tab-size:4;
+}
+.block-code textarea:focus { outline:none; }
 
-        /* Main Board Styles */
-        .main-board {
-            flex: 1;
-            background: #0a0a0f;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
+.block-link { background:#0d1520; border-radius:8px; padding:7px 9px; }
+.link-url-inp {
+    width:100%; background:#060a10; border:1px solid #1e2a3a; border-radius:6px;
+    color:#60a5fa; font-size:0.72rem; font-family:inherit; padding:5px 8px;
+}
+.link-url-inp:focus { outline:none; border-color:#3b82f6; }
+.link-label-inp {
+    width:100%; background:transparent; border:none; border-bottom:1px dashed #1e2a3a;
+    color:#cbd5e6; font-size:0.72rem; font-family:inherit; padding:4px 0; margin-top:5px;
+}
+.link-label-inp:focus { outline:none; border-bottom-color:#3b82f6; }
 
-        .board-header {
-            padding: 16px 28px;
-            background: rgba(10, 10, 15, 0.95);
-            border-bottom: 1px solid #1f2c38;
-        }
+/* Block add toolbar */
+.card-addblock-bar {
+    display:flex; gap:5px; padding:6px 8px 4px;
+    border-top:1px solid #1e2a3a; flex-wrap:wrap;
+}
+.addblock-btn {
+    background:#1e2a3a; border:none; padding:3px 9px; border-radius:20px;
+    color:#8ba0bc; font-size:0.65rem; cursor:pointer; font-family:inherit;
+    transition:all 0.15s;
+}
+.addblock-btn:hover { background:#1e3a5f; color:#7ab7ef; }
 
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
+/* Block delete */
+.block-delete-btn {
+    position:absolute; top:4px; right:4px;
+    background:none; border:none; color:transparent; cursor:pointer;
+    font-size:10px; border-radius:4px; padding:1px 4px; z-index:5;
+}
+.block:hover .block-delete-btn { color:#5a6e85; }
+.block-delete-btn:hover { color:#f87171 !important; background:#2a1a22; }
 
-        .active-info h3 {
-            color: #f1f5f9;
-            font-size: 1.1rem;
-            font-weight: 500;
-        }
+/* Card footer */
+.card-footer { padding:5px 8px 8px; display:flex; justify-content:space-between; align-items:center; }
+.color-selector { display:flex; gap:5px; }
+.color-option { width:18px; height:18px; border-radius:50%; cursor:pointer; border:1px solid rgba(255,255,255,0.2); }
+.expand-card-btn {
+    background:none; border:none; color:#5a6e85; font-size:0.68rem;
+    cursor:pointer; font-family:inherit; padding:2px 6px; border-radius:6px;
+}
+.expand-card-btn:hover { background:#1e3a5f; color:#7ab7ef; }
 
-        .board-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            align-items: flex-end;
-        }
+/* ─── CONNECTION POINTS ─── */
+.connection-point {
+    position:absolute; width:10px; height:10px;
+    background:#3b82f6; border-radius:50%; cursor:crosshair;
+    transition:all 0.2s; z-index:15; border:2px solid #fff; opacity:0.7;
+}
+.idea-card:hover .connection-point { opacity:1; }
+.connection-point:hover { background:#f59e0b; transform:scale(1.3); opacity:1; }
+.connection-point.top { top:-5px; left:50%; transform:translateX(-50%); }
+.connection-point.bottom { bottom:-5px; left:50%; transform:translateX(-50%); }
+.connection-point.left { left:-5px; top:50%; transform:translateY(-50%); }
+.connection-point.right { right:-5px; top:50%; transform:translateY(-50%); }
 
-        .action-btn {
-            background: #11161f;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 30px;
-            color: white;
-            font-weight: 500;
-            cursor: pointer;
-            font-size: 0.8rem;
-            min-width: 140px;
-        }
+svg { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:6; }
+svg line { pointer-events:stroke; }
 
-        .action-btn:hover {
-            background: #1e3a5f;
-        }
+/* ─── EXPAND MODAL ─── */
+.expand-overlay {
+    position:fixed; top:0; left:0; right:0; bottom:0;
+    background:rgba(0,0,0,0.88); backdrop-filter:blur(8px);
+    z-index:400; display:flex; align-items:center; justify-content:center;
+}
+.expand-container {
+    background:#0f1420; border-radius:16px; width:680px; max-width:95vw;
+    max-height:88vh; display:flex; flex-direction:column;
+    border:1px solid #2c4c6e; overflow:hidden;
+}
+.expand-header {
+    padding:16px 20px; border-bottom:1px solid #1e2a3a;
+    display:flex; align-items:center; gap:12px; background:#101824;
+}
+.expand-title-inp {
+    flex:1; background:transparent; border:none; color:#f0f4fe;
+    font-size:1.1rem; font-weight:600; font-family:inherit;
+}
+.expand-title-inp:focus { outline:none; }
+.expand-type { font-size:0.7rem; color:#7ab7ef; background:#1e3a5f; padding:3px 9px; border-radius:20px; }
+.expand-close { background:none; border:none; color:#7f8c9a; cursor:pointer; font-size:1.1rem; }
+.expand-close:hover { color:#f87171; }
+.expand-body { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:8px; }
+.expand-addbar { padding:12px 16px 14px; border-top:1px solid #1e2a3a; display:flex; gap:8px; flex-wrap:wrap; }
+.expand-addbar .addblock-btn { font-size:0.72rem; padding:5px 13px; }
 
-        /* Line Editor Bar */
-        .line-editor-bar {
-            background: #0f2b3f;
-            border-radius: 12px;
-            padding: 8px 16px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-top: 8px;
-        }
+/* ─── MODAL ─── */
+.modal-overlay {
+    position:fixed; top:0; left:0; right:0; bottom:0;
+    background:rgba(0,0,0,0.88); backdrop-filter:blur(6px);
+    z-index:300; display:flex; align-items:center; justify-content:center;
+}
+.modal-container {
+    background:#11161f; border-radius:16px; width:420px; max-width:93%;
+    padding:22px; border:1px solid #2c4c6e;
+}
+.modal-container h3 { color:#fff; margin-bottom:14px; font-size:1.1rem; }
+.modal-input {
+    width:100%; padding:9px 13px; background:#0a0c12; border:1px solid #2c4c6e;
+    border-radius:9px; color:#fff; margin-bottom:18px; outline:none; font-family:inherit;
+}
+.modal-input:focus { border-color:#3b82f6; }
+.modal-buttons { display:flex; gap:10px; justify-content:flex-end; }
+.modal-btn { padding:7px 16px; border-radius:30px; border:none; cursor:pointer; font-weight:500; font-family:inherit; }
+.modal-btn-cancel { background:#1e2a3a; color:#cbd5e6; }
+.modal-btn-confirm { background:#3b82f6; color:#fff; }
+.modal-btn-danger { background:#b91c1c; color:#fff; }
+.modal-btn-warn { background:#d97706; color:#fff; }
 
-        .line-editor-label {
-            color: #7ab7ef;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
+/* Trash modal */
+.trash-list { max-height:340px; overflow-y:auto; margin:14px 0; display:flex; flex-direction:column; gap:5px; }
+.trash-item {
+    background:#0a0c12; padding:9px 10px; border-radius:8px;
+    display:flex; align-items:center; gap:9px; cursor:pointer;
+    border:1px solid #1e2a3a; transition:0.15s;
+}
+.trash-item:hover { border-color:#2c4c6e; }
+.trash-item.selected { background:#0f2b3f; border-color:#3b82f6; }
+.trash-checkbox { width:14px; height:14px; accent-color:#3b82f6; cursor:pointer; flex-shrink:0; }
+.trash-info { flex:1; }
+.trash-name { font-weight:500; font-size:0.78rem; color:#e2e8f0; }
+.trash-meta { font-size:0.62rem; color:#7a8aa5; margin-top:2px; display:flex; align-items:center; gap:5px; }
+.trash-type-badge {
+    padding:1px 6px; border-radius:10px; font-size:0.6rem; font-weight:600;
+}
+.tb-fikir { background:#1e3a5f; color:#7ab7ef; }
+.tb-proje { background:#2a1a4a; color:#c084fc; }
+.tb-modul { background:#0f3a2a; color:#34d399; }
+.tb-not { background:#1e2a3a; color:#94a3b8; }
+.empty-trash { text-align:center; padding:36px; color:#5a6e85; }
 
-        .color-picker-group {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
+/* ─── TOAST ─── */
+.toast-msg {
+    position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
+    background:#1e293bdd; backdrop-filter:blur(12px); color:#fff;
+    padding:7px 18px; border-radius:40px; font-size:0.78rem;
+    z-index:500; pointer-events:none; transition:opacity 0.3s;
+}
 
-        .line-color-option {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: 0.1s;
-        }
+/* ─── UNDO INDICATOR ─── */
+.undo-hint {
+    position:fixed; bottom:66px; left:50%; transform:translateX(-50%);
+    background:#0f2b3f; color:#7ab7ef; padding:5px 14px; border-radius:30px;
+    font-size:0.7rem; z-index:400; pointer-events:none; opacity:0; transition:opacity 0.3s;
+}
 
-        .line-color-option:hover {
-            transform: scale(1.15);
-            border-color: white;
-        }
-
-        .stroke-btn {
-            background: #1e2a3a;
-            border: none;
-            padding: 4px 12px;
-            border-radius: 20px;
-            color: white;
-            font-size: 0.7rem;
-            cursor: pointer;
-            font-family: inherit;
-        }
-
-        .stroke-btn:hover {
-            background: #3b82f6;
-        }
-
-        .line-action-btn {
-            background: #2a1a22;
-            border: none;
-            padding: 4px 12px;
-            border-radius: 20px;
-            color: #f08b8b;
-            font-size: 0.7rem;
-            cursor: pointer;
-            font-family: inherit;
-        }
-
-        .line-action-btn:hover {
-            background: #b91c1c;
-            color: white;
-        }
-
-        .close-editor-btn {
-            background: #1e2a3a;
-            border: none;
-            padding: 4px 12px;
-            border-radius: 20px;
-            color: #a0b3d0;
-            font-size: 0.7rem;
-            cursor: pointer;
-            font-family: inherit;
-            margin-left: auto;
-        }
-
-        .close-editor-btn:hover {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .selection-info {
-            color: #60a5fa;
-            font-size: 0.7rem;
-            background: #1e3a5f;
-            padding: 4px 10px;
-            border-radius: 20px;
-        }
-
-        .module-tabs {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 8px;
-            align-items: center;
-        }
-
-        .module-tab {
-            background: #11161f;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 20px;
-            color: #a0b3d0;
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .module-tab:hover {
-            background: #1e2a3a;
-            color: white;
-        }
-
-        .module-tab.active-tab {
-            background: #1e3a5f;
-            color: white;
-        }
-
-        .delete-module-btn {
-            background: none;
-            border: none;
-            color: #7f8c9a;
-            cursor: pointer;
-            font-size: 0.7rem;
-            padding: 2px 6px;
-            border-radius: 12px;
-            opacity: 0.7;
-        }
-
-        .delete-module-btn:hover {
-            background: #b91c1c30;
-            color: #f87171;
-            opacity: 1;
-        }
-
-        .add-module-btn {
-            background: #0f2b3f;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 20px;
-            color: #7ab7ef;
-            font-size: 0.7rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .whiteboard-canvas {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-            background: radial-gradient(circle at 10% 20%, #0f121a, #050508);
-            background-image: linear-gradient(rgba(59,130,246,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.05) 1px, transparent 1px);
-            background-size: 28px 28px;
-            cursor: default;
-        }
-
-        .notes-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            overflow: visible;
-        }
-
-        /* Selection Rectangle */
-        .selection-rect {
-            position: absolute;
-            border: 2px solid #3b82f6;
-            background: rgba(59, 130, 246, 0.1);
-            pointer-events: none;
-            z-index: 200;
-            display: none;
-        }
-
-        /* Card Styles */
-        .idea-card {
-            position: absolute;
-            min-width: 220px;
-            max-width: 300px;
-            background: #141a24;
-            border-radius: 16px;
-            padding: 12px 14px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-            cursor: grab;
-            border: 1px solid rgba(59,130,246,0.3);
-            transition: box-shadow 0.2s, transform 0.1s;
-            z-index: 10;
-        }
-
-        .idea-card:active { cursor: grabbing; }
-        .idea-card.selected-card {
-            box-shadow: 0 0 0 3px #3b82f6, 0 8px 20px rgba(0,0,0,0.4);
-            z-index: 100;
-            transform: scale(1.02);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .drag-area { 
-            cursor: grab; 
-            color: #5a6e8a; 
-            font-size: 14px; 
-            padding: 0 4px;
-            user-select: none;
-        }
-        
-        .connector-btn {
-            cursor: pointer;
-            background: #3b82f6;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            transition: all 0.2s;
-        }
-        
-        .connector-btn:hover {
-            background: #60a5fa;
-            transform: scale(1.1);
-        }
-        
-        .connector-btn.active-connector {
-            background: #f59e0b;
-            box-shadow: 0 0 8px #f59e0b;
-        }
-
-        .card-title {
-            font-weight: 600;
-            font-size: 0.85rem;
-            background: transparent;
-            border: none;
-            color: #f0f4fe;
-            width: 60%;
-            padding: 4px 0;
-            font-family: inherit;
-            border-bottom: 1px dashed #2c4c6e;
-        }
-        
-        .card-title:focus { outline: none; border-bottom-color: #3b82f6; }
-        
-        .card-content {
-            font-size: 0.75rem;
-            color: #cbd5e6;
-            background: #0f131c;
-            border: none;
-            width: 100%;
-            resize: vertical;
-            border-radius: 12px;
-            padding: 8px;
-            margin-top: 6px;
-            font-family: inherit;
-        }
-        
-        .card-content:focus { outline: none; background: #1a2230; }
-        
-        .delete-card {
-            background: #2a1a22;
-            border: none;
-            color: #f08b8b;
-            width: 24px;
-            height: 24px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        
-        .delete-card:hover { background: #b91c1c; color: white; }
-        
-        .color-selector {
-            margin-top: 8px;
-            display: flex;
-            gap: 6px;
-            justify-content: flex-end;
-            border-top: 1px solid #1e2a3a;
-            padding-top: 8px;
-        }
-        
-        .color-option {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-
-        /* Connection Points */
-        .connection-point {
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background: #3b82f6;
-            border-radius: 50%;
-            cursor: crosshair;
-            transition: all 0.2s;
-            z-index: 15;
-            border: 2px solid white;
-        }
-        
-        .connection-point:hover {
-            background: #f59e0b;
-            transform: scale(1.3);
-        }
-        
-        .connection-point.top { top: -6px; left: 50%; transform: translateX(-50%); }
-        .connection-point.bottom { bottom: -6px; left: 50%; transform: translateX(-50%); }
-        .connection-point.left { left: -6px; top: 50%; transform: translateY(-50%); }
-        .connection-point.right { right: -6px; top: 50%; transform: translateY(-50%); }
-
-        svg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 6;
-        }
-        
-        svg line {
-            pointer-events: stroke;
-        }
-
-        .toast-msg {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1e293bc9;
-            backdrop-filter: blur(12px);
-            color: white;
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-size: 0.8rem;
-            z-index: 200;
-            pointer-events: none;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(6px);
-            z-index: 300;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .modal-container {
-            background: #11161f;
-            border-radius: 20px;
-            width: 400px;
-            max-width: 90%;
-            padding: 24px;
-            border: 1px solid #2c4c6e;
-        }
-        
-        .modal-container h3 { color: white; margin-bottom: 16px; font-size: 1.2rem; }
-        .modal-input {
-            width: 100%;
-            padding: 10px 14px;
-            background: #0a0c12;
-            border: 1px solid #2c4c6e;
-            border-radius: 10px;
-            color: white;
-            margin-bottom: 20px;
-            outline: none;
-        }
-        .modal-input:focus { border-color: #3b82f6; }
-        .modal-buttons { display: flex; gap: 12px; justify-content: flex-end; }
-        .modal-btn {
-            padding: 8px 18px;
-            border-radius: 30px;
-            border: none;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        .modal-btn-cancel { background: #1e2a3a; color: #cbd5e6; }
-        .modal-btn-confirm { background: #3b82f6; color: white; }
-        .modal-btn-danger { background: #b91c1c; color: white; }
-
-        .trash-list { max-height: 350px; overflow-y: auto; margin: 16px 0; }
-        .trash-item {
-            background: #0a0c12;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            border: 1px solid #1e2a3a;
-        }
-        .trash-item.selected { background: #0f2b3f; border-color: #3b82f6; }
-        .trash-checkbox { width: 16px; height: 16px; accent-color: #3b82f6; cursor: pointer; }
-        .trash-info { flex: 1; }
-        .trash-name { font-weight: 500; font-size: 0.8rem; }
-        .trash-meta { font-size: 0.65rem; color: #7a8aa5; margin-top: 2px; }
-        .trash-badge { background: #1e2a3a; padding: 2px 6px; border-radius: 12px; font-size: 0.6rem; }
-        .empty-trash { text-align: center; padding: 40px; color: #5a6e85; }
-
-        .lists-container::-webkit-scrollbar { width: 4px; }
-        .lists-container::-webkit-scrollbar-track { background: #0a0c12; }
-        .lists-container::-webkit-scrollbar-thumb { background: #2c5270; }
-    </style>
+.lists-container::-webkit-scrollbar { width:3px; }
+.lists-container::-webkit-scrollbar-track { background:#0a0c12; }
+.lists-container::-webkit-scrollbar-thumb { background:#2c5270; }
+</style>
 </head>
 <body>
 <div class="app-layout">
+    <!-- SIDEBAR -->
     <div class="sidebar">
         <div class="sidebar-header">
             <h2>BlackBoard</h2>
+            <div class="save-indicator">
+                <div class="save-dot" id="SaveDot"></div>
+                <span class="save-text" id="SaveText">Kaydedildi</span>
+            </div>
         </div>
         <div class="create-buttons">
             <button class="create-btn" id="AddFikirBtn">+ Fikir Ekle</button>
@@ -688,7 +442,7 @@
         </div>
         <div class="lists-container">
             <div class="list-section">
-                <div class="section-label">FIKIRLER</div>
+                <div class="section-label">FİKİRLER</div>
                 <div class="items-list" id="fikirlerList"></div>
             </div>
             <div class="list-section">
@@ -696,20 +450,23 @@
                 <div class="items-list" id="projelerList"></div>
             </div>
             <div class="trash-section">
-                <button class="trash-btn" id="TrashBinBtn">Çöp Kutusu</button>
+                <button class="trash-btn" id="TrashBinBtn">🗑 Çöp Kutusu</button>
             </div>
         </div>
     </div>
 
+    <!-- MAIN -->
     <div class="main-board">
         <div class="board-header">
             <div class="header-top">
                 <div class="active-info">
                     <h3 id="ActiveTitle">Ana Pano</h3>
                 </div>
-                <div class="board-actions">
-                    <button class="action-btn" id="AddNoteToActiveBtn">+ Not Ekle</button>
-                    <button class="action-btn" id="EnableLineEditBtn" style="background:#1e3a5f;">Cizgileri Duzenle</button>
+                <div class="board-actions" id="BoardActions">
+                    <button class="action-btn primary" id="AddNoteToActiveBtn">+ Not Ekle</button>
+                    <button class="action-btn" id="EnableLineEditBtn">Çizgileri Düzenle</button>
+                    <button class="action-btn" id="UndoBtn" title="Ctrl+Z">↩ Geri Al</button>
+                    <button class="action-btn warn" id="SaveManualBtn">💾 Kaydet</button>
                 </div>
             </div>
             <div id="LineEditorContainer"></div>
@@ -717,1128 +474,994 @@
         </div>
         <div class="whiteboard-canvas" id="WhiteboardCanvas">
             <div class="selection-rect" id="SelectionRect"></div>
-            <svg id="LinesSvg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 6;"></svg>
+            <svg id="LinesSvg"></svg>
             <div class="notes-container" id="NotesContainer"></div>
         </div>
     </div>
 </div>
+
 <div id="ToastMsg" class="toast-msg" style="opacity:0;"></div>
+<div id="UndoHint" class="undo-hint">Geri alındı</div>
 
 <script>
-    // ---------- INDEXEDDB ----------
-    const DB_NAME = 'BlackBoardDB';
-    const DB_VERSION = 9;
-    const STORE_NAME = 'appData';
-    
-    let db = null;
-    
-    let fikirler = [];
-    let projeler = [];
-    let aktifTip = null;
-    let aktifId = null;
-    let aktifModulId = null;
-    let trashBin = [];
-    
-    let nextFikirId = 1;
-    let nextProjeId = 1;
-    let nextModulId = 1;
-    let nextNoteId = 100;
-    let nextTrashId = 1;
-    let nextConnectionId = 1;
-    
-    // Cizgi baglantilari
-    let connections = [];
-    let lineColors = {};
-    let lineWidths = {};
-    let selectedCardId = null;
-    let isConnectingMode = false;
-    let connectingFromCard = null;
-    
-    // Cizgi duzenleme modu
-    let isLineEditMode = false;
-    let selectedLineIds = new Set();
-    
-    // Mouse selection
-    let isSelecting = false;
-    let selectionStart = { x: 0, y: 0 };
-    let selectionRect = null;
-    let selectedNoteIds = new Set();
-    
-    const colorPalette = ["#1e293b", "#2d1b36", "#1a2e3a", "#2a2a35", "#1e3a4d", "#2c2a3e", "#1f3a3f", "#3b2f2f", "#2f3b2f"];
-    const lineColorsList = ["#60a5fa", "#f59e0b", "#10b981", "#ef4444", "#a855f7", "#ec489a", "#14b8a6", "#f97316", "#8b5cf6"];
-    
-    const fikirlerListDiv = document.getElementById('fikirlerList');
-    const projelerListDiv = document.getElementById('projelerList');
-    const notesContainer = document.getElementById('NotesContainer');
-    const whiteboardCanvas = document.getElementById('WhiteboardCanvas');
-    const activeTitleSpan = document.getElementById('ActiveTitle');
-    const moduleTabsContainer = document.getElementById('ModuleTabsContainer');
-    const lineEditorContainer = document.getElementById('LineEditorContainer');
-    const toastEl = document.getElementById('ToastMsg');
-    const linesSvg = document.getElementById('LinesSvg');
-    
-    function ShowToast(msg, duration = 1500) {
-        toastEl.style.opacity = '1';
-        toastEl.innerText = msg;
-        setTimeout(() => { toastEl.style.opacity = '0'; }, duration);
-    }
-    
-    function GetRandomPosition() {
-        const rect = notesContainer.getBoundingClientRect();
-        const w = rect.width || 900, h = rect.height || 500;
-        return { left: Math.min(Math.max(30 + Math.random() * (w - 260), 20), w - 220), top: Math.min(Math.max(30 + Math.random() * (h - 200), 20), h - 160) };
-    }
-    
-    function InitDB() {
-        return new Promise((resolve, reject) => {
-            const req = indexedDB.open(DB_NAME, DB_VERSION);
-            req.onerror = () => reject(req.error);
-            req.onsuccess = () => { db = req.result; resolve(); };
-            req.onupgradeneeded = (e) => { if (!e.target.result.objectStoreNames.contains(STORE_NAME)) e.target.result.createObjectStore(STORE_NAME); };
-        });
-    }
-    
-    async function SaveToDB() {
-        if (!db) return;
-        const data = { fikirler, projeler, aktifTip, aktifId, aktifModulId, trashBin, nextFikirId, nextProjeId, nextModulId, nextNoteId, nextTrashId, nextConnectionId, connections, lineColors, lineWidths };
-        const tx = db.transaction(STORE_NAME, 'readwrite');
-        tx.objectStore(STORE_NAME).put(data, 'mainData');
-        return tx.complete;
-    }
-    
-    async function LoadFromDB() {
-        if (!db) return false;
-        const tx = db.transaction(STORE_NAME, 'readonly');
-        return new Promise((resolve) => {
-            const req = tx.objectStore(STORE_NAME).get('mainData');
-            req.onsuccess = () => {
-                const data = req.result;
-                if (data) {
-                    fikirler = data.fikirler || [];
-                    projeler = data.projeler || [];
-                    aktifTip = data.aktifTip || null;
-                    aktifId = data.aktifId || null;
-                    aktifModulId = data.aktifModulId || null;
-                    trashBin = data.trashBin || [];
-                    connections = data.connections || [];
-                    lineColors = data.lineColors || {};
-                    lineWidths = data.lineWidths || {};
-                    nextFikirId = data.nextFikirId || 1;
-                    nextProjeId = data.nextProjeId || 1;
-                    nextModulId = data.nextModulId || 1;
-                    nextNoteId = data.nextNoteId || 100;
-                    nextTrashId = data.nextTrashId || 1;
-                    nextConnectionId = data.nextConnectionId || 1;
-                } else CreateInitialData();
-                resolve(true);
-            };
-            req.onerror = () => { CreateInitialData(); resolve(true); };
-        });
-    }
-    
-    function CreateInitialData() {
-        fikirler = [{ id: nextFikirId++, name: "Mobil Uygulama", notes: [{ id: nextNoteId++, title: "Ana Ozellik", content: "Kullanici dostu arayuz", left: 100, top: 80, bgColor: "#1e293b" }] }];
-        const modul1 = { id: nextModulId++, name: "Ana Modul", notes: [{ id: nextNoteId++, title: "Baslangic", content: "Proje notlari burada", left: 200, top: 120, bgColor: "#1e293b" }] };
-        const modul2 = { id: nextModulId++, name: "Algoritmalar", notes: [{ id: nextNoteId++, title: "Drone Algoritmasi", content: "PID kontrol, sensor fuzyonu", left: 400, top: 160, bgColor: "#1e3a4d" }] };
-        projeler = [{ id: nextProjeId++, name: "Drone Projesi", modules: [modul1, modul2] }];
-        aktifTip = 'fikir';
-        aktifId = fikirler[0].id;
-        aktifModulId = null;
-        connections = [];
-        lineColors = {};
-        lineWidths = {};
-    }
-    
-    function ShowModal(title, placeholder, onConfirm, defaultValue = "") {
-        const modal = document.createElement('div'); modal.className = 'modal-overlay';
-        modal.innerHTML = `<div class="modal-container"><h3>${title}</h3><input type="text" class="modal-input" id="ModalInput" placeholder="${placeholder}" value="${defaultValue.replace(/"/g, '&quot;')}"><div class="modal-buttons"><button class="modal-btn modal-btn-cancel" id="ModalCancel">Iptal</button><button class="modal-btn modal-btn-confirm" id="ModalConfirm">Ekle</button></div></div>`;
-        document.body.appendChild(modal);
-        const input = modal.querySelector('#ModalInput');
-        input.focus();
-        const close = () => modal.remove();
-        modal.querySelector('#ModalCancel').onclick = close;
-        modal.querySelector('#ModalConfirm').onclick = () => { const val = input.value.trim(); if (val) onConfirm(val); close(); };
-        input.addEventListener('keypress', (e) => { if (e.key === 'Enter') modal.querySelector('#ModalConfirm').click(); });
-    }
-    
-    // MOUSE SELECTION (Alan Secme)
-    function initSelection() {
-        selectionRect = document.getElementById('SelectionRect');
-        
-        whiteboardCanvas.addEventListener('mousedown', (e) => {
-            if (e.target.closest('.idea-card') || e.target.closest('.connection-point') || e.target.closest('.connector-btn')) return;
-            if (e.button !== 0) return;
-            
-            isSelecting = true;
-            const rect = whiteboardCanvas.getBoundingClientRect();
-            selectionStart.x = e.clientX - rect.left;
-            selectionStart.y = e.clientY - rect.top;
-            selectionRect.style.display = 'block';
-            selectionRect.style.left = selectionStart.x + 'px';
-            selectionRect.style.top = selectionStart.y + 'px';
-            selectionRect.style.width = '0px';
-            selectionRect.style.height = '0px';
-        });
-        
-        window.addEventListener('mousemove', (e) => {
-            if (!isSelecting) return;
-            const rect = whiteboardCanvas.getBoundingClientRect();
-            const currentX = e.clientX - rect.left;
-            const currentY = e.clientY - rect.top;
-            
-            const left = Math.min(selectionStart.x, currentX);
-            const top = Math.min(selectionStart.y, currentY);
-            const width = Math.abs(currentX - selectionStart.x);
-            const height = Math.abs(currentY - selectionStart.y);
-            
-            selectionRect.style.left = left + 'px';
-            selectionRect.style.top = top + 'px';
-            selectionRect.style.width = width + 'px';
-            selectionRect.style.height = height + 'px';
-        });
-        
-        window.addEventListener('mouseup', (e) => {
-            if (!isSelecting) return;
-            isSelecting = false;
-            
-            const rect = whiteboardCanvas.getBoundingClientRect();
-            const endX = e.clientX - rect.left;
-            const endY = e.clientY - rect.top;
-            
-            const left = Math.min(selectionStart.x, endX);
-            const top = Math.min(selectionStart.y, endY);
-            const right = Math.max(selectionStart.x, endX);
-            const bottom = Math.max(selectionStart.y, endY);
-            
-            if (right - left > 5 && bottom - top > 5) {
-                document.querySelectorAll('.idea-card').forEach(card => {
-                    const cardRect = card.getBoundingClientRect();
-                    const cardLeft = cardRect.left - rect.left;
-                    const cardTop = cardRect.top - rect.top;
-                    const cardRight = cardRect.right - rect.left;
-                    const cardBottom = cardRect.bottom - rect.top;
-                    
-                    if (cardRight > left && cardLeft < right && cardBottom > top && cardTop < bottom) {
-                        const noteId = parseInt(card.getAttribute('data-note-id'));
-                        selectedNoteIds.add(noteId);
-                        card.classList.add('selected-card');
-                    }
-                });
-                if (selectedNoteIds.size > 0) {
-                    ShowToast(selectedNoteIds.size + " not secildi. Silmek icin Delete tusuna basin.", 2000);
-                }
-            }
-            
-            selectionRect.style.display = 'none';
-        });
-        
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Delete' && selectedNoteIds.size > 0) {
-                if (confirm(selectedNoteIds.size + " notu silmek istediginize emin misiniz?")) {
-                    selectedNoteIds.forEach(noteId => DeleteNote(noteId));
-                    selectedNoteIds.clear();
-                    ShowToast("Secilen notlar silindi", 1000);
-                }
-            }
-            if (e.key === 'Escape') {
-                selectedNoteIds.clear();
-                document.querySelectorAll('.idea-card').forEach(c => c.classList.remove('selected-card'));
-                ShowToast("Secim kaldirildi", 800);
-            }
-        });
-    }
-    
-    // CIZGI DUZENLEME MODU
-    function EnableLineEditMode() {
-        if (connections.length === 0) {
-            ShowToast("Duzelenecek cizgi yok", 1500);
-            return;
-        }
-        isLineEditMode = true;
-        selectedLineIds.clear();
-        RenderLineEditorBar();
-        RenderLines();
-        ShowToast("Cizgi duzenleme modu aktif - cizgilere tiklayarak secin", 2000);
-    }
-    
-    function DisableLineEditMode() {
-        isLineEditMode = false;
-        selectedLineIds.clear();
-        RenderLineEditorBar();
-        RenderLines();
-        ShowToast("Cizgi duzenleme modu kapandi", 1000);
-    }
-    
-    function ToggleLineSelection(lineId) {
-        if (!isLineEditMode) return;
-        if (selectedLineIds.has(lineId)) {
-            selectedLineIds.delete(lineId);
-        } else {
-            selectedLineIds.add(lineId);
-        }
-        RenderLineEditorBar();
-        RenderLines();
-    }
-    
-    function SelectAllLines() {
-        if (!isLineEditMode) return;
-        connections.forEach(c => selectedLineIds.add(c.id));
-        RenderLineEditorBar();
-        RenderLines();
-        ShowToast(selectedLineIds.size + " cizgi secildi", 1000);
-    }
-    
-    function DeselectAllLines() {
-        if (!isLineEditMode) return;
-        selectedLineIds.clear();
-        RenderLineEditorBar();
-        RenderLines();
-        ShowToast("Secim kaldirildi", 800);
-    }
-    
-    function ApplyColorToSelected(color) {
-        if (selectedLineIds.size === 0) {
-            ShowToast("Once cizgi secin", 1000);
-            return;
-        }
-        selectedLineIds.forEach(id => {
-            lineColors[id] = color;
-        });
-        RenderLines();
-        SaveToDB();
-        ShowToast(selectedLineIds.size + " cizginin rengi degistirildi", 1000);
-    }
-    
-    function ApplyStrokeToSelected(width) {
-        if (selectedLineIds.size === 0) {
-            ShowToast("Once cizgi secin", 1000);
-            return;
-        }
-        selectedLineIds.forEach(id => {
-            lineWidths[id] = width;
-        });
-        RenderLines();
-        SaveToDB();
-        ShowToast(selectedLineIds.size + " cizginin kalinligi degistirildi", 1000);
-    }
-    
-    function DeleteSelectedLines() {
-        if (selectedLineIds.size === 0) {
-            ShowToast("Silinecek cizgi secin", 1000);
-            return;
-        }
-        if (confirm(selectedLineIds.size + " cizgiyi silmek istediginize emin misiniz?")) {
-            connections = connections.filter(c => !selectedLineIds.has(c.id));
-            selectedLineIds.forEach(id => {
-                delete lineColors[id];
-                delete lineWidths[id];
-            });
-            selectedLineIds.clear();
-            SaveToDB();
-            RenderLines();
-            if (connections.length === 0) {
-                DisableLineEditMode();
-            } else {
-                RenderLineEditorBar();
-            }
-            ShowToast("Secilen cizgiler silindi", 1200);
-        }
-    }
-    
-    function DeleteAllLines() {
-        if (connections.length === 0) {
-            ShowToast("Silinecek cizgi yok", 1000);
-            return;
-        }
-        if (confirm("Tum " + connections.length + " cizgiyi silmek istediginize emin misiniz?")) {
-            connections = [];
-            lineColors = {};
-            lineWidths = {};
-            selectedLineIds.clear();
-            SaveToDB();
-            RenderLines();
-            DisableLineEditMode();
-            ShowToast("Tum cizgiler silindi", 1200);
-        }
-    }
-    
-    function RenderLineEditorBar() {
-        if (!isLineEditMode) {
-            lineEditorContainer.innerHTML = '';
-            return;
-        }
-        
-        lineEditorContainer.innerHTML = `
-            <div class="line-editor-bar">
-                <span class="line-editor-label">Cizgi Duzenleme Modu</span>
-                <span class="selection-info">${selectedLineIds.size} secili</span>
-                
-                <div class="color-picker-group">
-                    ${lineColorsList.map(color => `
-                        <div class="line-color-option" style="background:${color}" data-color="${color}"></div>
-                    `).join('')}
-                </div>
-                
-                <div class="color-picker-group">
-                    <button class="stroke-btn" data-width="2">Ince</button>
-                    <button class="stroke-btn" data-width="4">Normal</button>
-                    <button class="stroke-btn" data-width="6">Kalin</button>
-                </div>
-                
-                <div class="color-picker-group">
-                    <button class="line-action-btn" id="SelectAllLinesBtn">Tumunu Sec</button>
-                    <button class="line-action-btn" id="DeselectAllLinesBtn">Secimi Kaldir</button>
-                    <button class="line-action-btn" id="DeleteSelectedLinesBtn" style="background:#b91c1c; color:white;">Secilenleri Sil</button>
-                    <button class="line-action-btn" id="DeleteAllLinesBtn" style="background:#b91c1c; color:white;">Tumunu Sil</button>
-                </div>
-                
-                <button class="close-editor-btn" id="CloseLineEditorBtn">Duzenlemeyi Kapat</button>
-            </div>
-        `;
-        
-        document.querySelectorAll('.line-color-option').forEach(el => {
-            el.onclick = () => ApplyColorToSelected(el.getAttribute('data-color'));
-        });
-        document.querySelectorAll('.stroke-btn').forEach(el => {
-            el.onclick = () => ApplyStrokeToSelected(parseInt(el.getAttribute('data-width')));
-        });
-        const selectAllBtn = document.getElementById('SelectAllLinesBtn');
-        if (selectAllBtn) selectAllBtn.onclick = () => SelectAllLines();
-        const deselectAllBtn = document.getElementById('DeselectAllLinesBtn');
-        if (deselectAllBtn) deselectAllBtn.onclick = () => DeselectAllLines();
-        const deleteSelectedBtn = document.getElementById('DeleteSelectedLinesBtn');
-        if (deleteSelectedBtn) deleteSelectedBtn.onclick = () => DeleteSelectedLines();
-        const deleteAllBtn = document.getElementById('DeleteAllLinesBtn');
-        if (deleteAllBtn) deleteAllBtn.onclick = () => DeleteAllLines();
-        const closeBtn = document.getElementById('CloseLineEditorBtn');
-        if (closeBtn) closeBtn.onclick = () => DisableLineEditMode();
-    }
-    
-    // FIKIR ISLEMLERI
-    function AddNewFikir() {
-        ShowModal('Yeni Fikir', 'Fikir adi...', (name) => {
-            const yeniFikir = { id: nextFikirId++, name: name, notes: [] };
-            fikirler.push(yeniFikir);
-            RenderSidebar();
-            SetActiveFikir(yeniFikir.id);
-            SaveToDB();
-            ShowToast('"' + name + '" fikri eklendi');
-        });
-    }
-    
-    function SetActiveFikir(fikirId) {
-        const f = fikirler.find(fk => fk.id === fikirId);
-        if (!f) return;
-        aktifTip = 'fikir';
-        aktifId = fikirId;
-        aktifModulId = null;
-        activeTitleSpan.innerText = f.name;
-        moduleTabsContainer.innerHTML = '';
-        selectedCardId = null;
-        isConnectingMode = false;
-        connectingFromCard = null;
-        selectedNoteIds.clear();
-        if (isLineEditMode) DisableLineEditMode();
-        RenderSidebar();
-        RenderBoard();
-        SaveToDB();
-    }
-    
-    function DeleteFikir(id) {
-        const index = fikirler.findIndex(f => f.id === id);
-        if (index !== -1) {
-            const f = fikirler[index];
-            f.notes.forEach(note => {
-                trashBin.push({ id: nextTrashId++, type: 'not', name: note.title, parentName: f.name, deletedAt: new Date().toISOString(), originalData: note, parentId: f.id, parentType: 'fikir' });
-            });
-            trashBin.push({ id: nextTrashId++, type: 'fikir', name: f.name, parentName: 'Genel', deletedAt: new Date().toISOString(), originalData: { name: f.name, notes: f.notes }, parentId: null, parentType: null });
-            fikirler.splice(index, 1);
-            if (aktifTip === 'fikir' && aktifId === id) {
-                if (fikirler.length > 0) SetActiveFikir(fikirler[0].id);
-                else if (projeler.length > 0) SetActiveProje(projeler[0].id);
-                else { aktifTip = null; aktifId = null; activeTitleSpan.innerText = "Ana Pano"; moduleTabsContainer.innerHTML = ''; RenderBoard(); }
-            }
-            if (isLineEditMode) DisableLineEditMode();
-            RenderSidebar(); SaveToDB(); ShowToast('"' + f.name + '" fikri ve notlari cop kutusuna tasindi');
-        }
-    }
-    
-    // PROJE ISLEMLERI
-    function AddNewProje() {
-        ShowModal('Yeni Proje', 'Proje adi...', (name) => {
-            const yeniProje = { id: nextProjeId++, name: name, modules: [] };
-            projeler.push(yeniProje);
-            RenderSidebar();
-            SetActiveProje(yeniProje.id);
-            SaveToDB();
-            ShowToast('"' + name + '" projesi eklendi');
-        });
-    }
-    
-    function AddNewModule() {
-        const proje = projeler.find(p => p.id === aktifId);
-        if (!proje && aktifTip === 'proje') { ShowToast("Once bir proje secin", 1000); return; }
-        if (aktifTip !== 'proje') { ShowToast("Modul eklemek icin bir proje secin", 1000); return; }
-        ShowModal('Yeni Modul', 'Modul adi (orn: algoritmalar, tasarim)...', (name) => {
-            const yeniModul = { id: nextModulId++, name: name, notes: [] };
-            proje.modules.push(yeniModul);
-            SetActiveModul(yeniModul.id);
-            RenderModuleTabs();
-            RenderBoard();
-            RenderSidebar();
-            SaveToDB();
-            ShowToast('"' + name + '" modulu eklendi');
-        });
-    }
-    
-    function DeleteModule(modulId) {
-        const proje = projeler.find(p => p.id === aktifId);
-        if (!proje) return;
-        const modulIndex = proje.modules.findIndex(m => m.id === modulId);
-        if (modulIndex !== -1) {
-            const modul = proje.modules[modulIndex];
-            modul.notes.forEach(note => {
-                trashBin.push({ id: nextTrashId++, type: 'not', name: note.title, parentName: proje.name + " / " + modul.name, deletedAt: new Date().toISOString(), originalData: note, parentId: proje.id, parentType: 'proje', modulId: modul.id });
-            });
-            trashBin.push({ id: nextTrashId++, type: 'modul', name: modul.name, parentName: proje.name, deletedAt: new Date().toISOString(), originalData: { name: modul.name, notes: modul.notes }, parentId: proje.id, parentType: 'proje' });
-            proje.modules.splice(modulIndex, 1);
-            if (aktifModulId === modulId) {
-                if (proje.modules.length > 0) SetActiveModul(proje.modules[0].id);
-                else { aktifModulId = null; RenderModuleTabs(); RenderBoard(); }
-            }
-            RenderModuleTabs();
-            RenderBoard();
-            RenderSidebar();
-            SaveToDB();
-            ShowToast('"' + modul.name + '" modulu ve notlari cop kutusuna tasindi');
-        }
-    }
-    
-    function SetActiveProje(projeId) {
-        const proje = projeler.find(p => p.id === projeId);
-        if (!proje) return;
-        aktifTip = 'proje';
-        aktifId = projeId;
-        activeTitleSpan.innerText = proje.name;
-        if (proje.modules.length > 0) {
-            const mevcutModul = proje.modules.find(m => m.id === aktifModulId);
-            if (mevcutModul) aktifModulId = mevcutModul.id;
-            else aktifModulId = proje.modules[0].id;
-        } else {
-            aktifModulId = null;
-        }
-        selectedCardId = null;
-        isConnectingMode = false;
-        connectingFromCard = null;
-        selectedNoteIds.clear();
-        if (isLineEditMode) DisableLineEditMode();
-        RenderSidebar();
-        RenderModuleTabs();
-        RenderBoard();
-        SaveToDB();
-    }
-    
-    function SetActiveModul(modulId) {
-        aktifModulId = modulId;
-        selectedCardId = null;
-        isConnectingMode = false;
-        connectingFromCard = null;
-        selectedNoteIds.clear();
-        if (isLineEditMode) DisableLineEditMode();
-        RenderModuleTabs();
-        RenderBoard();
-        SaveToDB();
-    }
-    
-    function DeleteProje(id) {
-        const index = projeler.findIndex(p => p.id === id);
-        if (index !== -1) {
-            const p = projeler[index];
-            p.modules.forEach(modul => {
-                modul.notes.forEach(note => {
-                    trashBin.push({ id: nextTrashId++, type: 'not', name: note.title, parentName: p.name + " / " + modul.name, deletedAt: new Date().toISOString(), originalData: note, parentId: p.id, parentType: 'proje', modulId: modul.id });
-                });
-                trashBin.push({ id: nextTrashId++, type: 'modul', name: modul.name, parentName: p.name, deletedAt: new Date().toISOString(), originalData: { name: modul.name, notes: modul.notes }, parentId: p.id, parentType: 'proje' });
-            });
-            trashBin.push({ id: nextTrashId++, type: 'proje', name: p.name, parentName: 'Genel', deletedAt: new Date().toISOString(), originalData: { name: p.name, modules: p.modules }, parentId: null, parentType: null });
-            projeler.splice(index, 1);
-            if (aktifTip === 'proje' && aktifId === id) {
-                if (projeler.length > 0) SetActiveProje(projeler[0].id);
-                else if (fikirler.length > 0) SetActiveFikir(fikirler[0].id);
-                else { aktifTip = null; aktifId = null; aktifModulId = null; activeTitleSpan.innerText = "Ana Pano"; moduleTabsContainer.innerHTML = ''; RenderBoard(); }
-            }
-            if (isLineEditMode) DisableLineEditMode();
-            RenderSidebar(); SaveToDB(); ShowToast('"' + p.name + '" projesi ve tum modulleri cop kutusuna tasindi');
-        }
-    }
-    
-    // ORTAK NOT ISLEMLERI
-    function GetCurrentNotes() {
-        if (aktifTip === 'fikir') {
-            const f = fikirler.find(fk => fk.id === aktifId);
-            return f ? f.notes : [];
-        } else if (aktifTip === 'proje') {
-            const proje = projeler.find(p => p.id === aktifId);
-            if (!proje || !aktifModulId) return [];
-            const modul = proje.modules.find(m => m.id === aktifModulId);
-            return modul ? modul.notes : [];
-        }
-        return [];
-    }
-    
-    function AddNoteToActive() {
-        if (!aktifTip || !aktifId) { ShowToast("Once bir fikir veya proje secin", 1200); return; }
-        const { left, top } = GetRandomPosition();
-        const yeniNote = { id: nextNoteId++, title: "Yeni not", content: "Detaylar...", left, top, bgColor: "#1e293b" };
-        
-        if (aktifTip === 'fikir') {
-            const f = fikirler.find(fk => fk.id === aktifId);
-            if (f) f.notes.push(yeniNote);
-        } else if (aktifTip === 'proje') {
-            const proje = projeler.find(p => p.id === aktifId);
-            if (proje && aktifModulId) {
-                const modul = proje.modules.find(m => m.id === aktifModulId);
-                if (modul) modul.notes.push(yeniNote);
-                else { ShowToast("Once bir modul secin", 1000); return; }
-            }
-        }
-        RenderBoard(); 
-        RenderSidebar();
-        SaveToDB(); 
-        ShowToast("Not eklendi", 1000);
-    }
-    
-    function DeleteNote(noteId) {
-        if (aktifTip === 'fikir') {
-            const f = fikirler.find(fk => fk.id === aktifId);
-            if (f) {
-                const index = f.notes.findIndex(n => n.id === noteId);
-                if (index !== -1) {
-                    const removed = f.notes.splice(index, 1)[0];
-                    trashBin.push({ id: nextTrashId++, type: 'not', name: removed.title, parentName: f.name, deletedAt: new Date().toISOString(), originalData: removed, parentId: f.id, parentType: 'fikir' });
-                    RemoveConnectionsForNote(noteId);
-                    RenderBoard(); 
-                    RenderSidebar();
-                    SaveToDB(); 
-                    ShowToast("Not cop kutusuna tasindi", 1000);
-                }
-            }
-        } else if (aktifTip === 'proje') {
-            const proje = projeler.find(p => p.id === aktifId);
-            if (proje && aktifModulId) {
-                const modul = proje.modules.find(m => m.id === aktifModulId);
-                if (modul) {
-                    const index = modul.notes.findIndex(n => n.id === noteId);
-                    if (index !== -1) {
-                        const removed = modul.notes.splice(index, 1)[0];
-                        trashBin.push({ id: nextTrashId++, type: 'not', name: removed.title, parentName: proje.name + " / " + modul.name, deletedAt: new Date().toISOString(), originalData: removed, parentId: proje.id, parentType: 'proje', modulId: modul.id });
-                        RemoveConnectionsForNote(noteId);
-                        RenderBoard(); 
-                        RenderSidebar();
-                        SaveToDB(); 
-                        ShowToast("Not cop kutusuna tasindi", 1000);
-                    }
-                }
-            }
-        }
-        selectedNoteIds.delete(noteId);
-    }
-    
-    function RemoveConnectionsForNote(noteId) {
-        const toDelete = connections.filter(c => c.from === noteId || c.to === noteId);
-        toDelete.forEach(c => {
-            delete lineColors[c.id];
-            delete lineWidths[c.id];
-            if (selectedLineIds.has(c.id)) selectedLineIds.delete(c.id);
-        });
-        connections = connections.filter(c => c.from !== noteId && c.to !== noteId);
-        RenderLines();
-        SaveToDB();
-    }
-    
-    // CIZGI BAGLANTI FONKSIYONLARI
-    function AddConnection(fromNoteId, toNoteId) {
-        if (fromNoteId === toNoteId) {
-            ShowToast("Ayni nota baglanti olusturamazsiniz", 1000);
-            return false;
-        }
-        const exists = connections.some(c => (c.from === fromNoteId && c.to === toNoteId) || (c.from === toNoteId && c.to === fromNoteId));
-        if (exists) {
-            ShowToast("Bu baglanti zaten var", 1000);
-            return false;
-        }
-        const newId = nextConnectionId++;
-        connections.push({ id: newId, from: fromNoteId, to: toNoteId });
-        RenderLines();
-        SaveToDB();
-        ShowToast("Baglanti olusturuldu", 800);
-        return true;
-    }
-    
-    function RemoveConnection(connectionId) {
-        connections = connections.filter(c => c.id !== connectionId);
-        delete lineColors[connectionId];
-        delete lineWidths[connectionId];
-        if (selectedLineIds.has(connectionId)) selectedLineIds.delete(connectionId);
-        RenderLines();
-        SaveToDB();
-        ShowToast("Baglanti kaldirildi", 800);
-    }
-    
-    function RenderLines() {
-        linesSvg.innerHTML = '';
-        connections.forEach(conn => {
-            const fromCard = document.querySelector(`.idea-card[data-note-id='${conn.from}']`);
-            const toCard = document.querySelector(`.idea-card[data-note-id='${conn.to}']`);
-            if (fromCard && toCard) {
-                const fromRect = fromCard.getBoundingClientRect();
-                const toRect = toCard.getBoundingClientRect();
-                const containerRect = notesContainer.getBoundingClientRect();
-                
-                const fromX = fromRect.left + fromRect.width / 2 - containerRect.left;
-                const fromY = fromRect.top + fromRect.height / 2 - containerRect.top;
-                const toX = toRect.left + toRect.width / 2 - containerRect.left;
-                const toY = toRect.top + toRect.height / 2 - containerRect.top;
-                
-                const lineColor = lineColors[conn.id] || '#60a5fa';
-                const lineWidth = lineWidths[conn.id] || 3;
-                const isSelected = isLineEditMode && selectedLineIds.has(conn.id);
-                
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', fromX);
-                line.setAttribute('y1', fromY);
-                line.setAttribute('x2', toX);
-                line.setAttribute('y2', toY);
-                line.setAttribute('stroke', lineColor);
-                line.setAttribute('stroke-width', isSelected ? lineWidth + 3 : lineWidth);
-                line.setAttribute('stroke-dasharray', '6, 4');
-                line.classList.add('connection-line');
-                line.style.cursor = 'pointer';
-                line.style.pointerEvents = 'stroke';
-                
-                line.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (isLineEditMode) {
-                        ToggleLineSelection(conn.id);
-                    } else {
-                        if (confirm('Bu baglantiyi silmek istiyor musunuz?')) {
-                            RemoveConnection(conn.id);
-                        }
-                    }
-                });
-                
-                linesSvg.appendChild(line);
-            }
-        });
-    }
-    
-    // COP KUTUSU
-    function RestoreFromTrash(selectedIndices) {
-        for (let i of selectedIndices.sort((a,b)=>b-a)) {
-            const item = trashBin[i];
-            if (item.type === 'fikir') {
-                const yeniFikir = { id: nextFikirId++, name: item.name, notes: item.originalData?.notes || [] };
-                yeniFikir.notes.forEach(n => { if(n.id >= nextNoteId) nextNoteId = n.id + 1; });
-                fikirler.push(yeniFikir);
-            } 
-            else if (item.type === 'proje') {
-                const yeniProje = { id: nextProjeId++, name: item.name, modules: item.originalData?.modules || [] };
-                yeniProje.modules.forEach(m => { if(m.id >= nextModulId) nextModulId = m.id + 1; });
-                yeniProje.modules.forEach(m => m.notes.forEach(n => { if(n.id >= nextNoteId) nextNoteId = n.id + 1; }));
-                projeler.push(yeniProje);
-            }
-            else if (item.type === 'modul') {
-                const proje = projeler.find(p => p.id === item.parentId);
-                if (proje) {
-                    const yeniModul = { id: nextModulId++, name: item.name, notes: item.originalData?.notes || [] };
-                    yeniModul.notes.forEach(n => { if(n.id >= nextNoteId) nextNoteId = n.id + 1; });
-                    proje.modules.push(yeniModul);
-                }
-            }
-            else if (item.type === 'not') {
-                if (item.parentType === 'fikir') {
-                    const fikir = fikirler.find(f => f.id === item.parentId);
-                    if (fikir && item.originalData) {
-                        const yeniNote = { ...item.originalData, id: nextNoteId++ };
-                        fikir.notes.push(yeniNote);
-                    }
-                } else if (item.parentType === 'proje' && item.modulId) {
-                    const proje = projeler.find(p => p.id === item.parentId);
-                    if (proje) {
-                        const modul = proje.modules.find(m => m.id === item.modulId);
-                        if (modul && item.originalData) {
-                            const yeniNote = { ...item.originalData, id: nextNoteId++ };
-                            modul.notes.push(yeniNote);
-                        }
-                    }
-                }
-            }
-            trashBin.splice(i, 1);
-        }
-        if (aktifTip === 'fikir' && !fikirler.find(f=>f.id===aktifId)) {
-            if (fikirler.length > 0) SetActiveFikir(fikirler[0].id);
-            else if (projeler.length > 0) SetActiveProje(projeler[0].id);
-        } else if (aktifTip === 'proje' && !projeler.find(p=>p.id===aktifId)) {
-            if (projeler.length > 0) SetActiveProje(projeler[0].id);
-            else if (fikirler.length > 0) SetActiveFikir(fikirler[0].id);
-        }
-        RenderSidebar();
-        RenderModuleTabs();
-        RenderBoard();
-        SaveToDB();
-    }
-    
-    // RENDER FONKSIYONLARI
-    function RenderSidebar() {
-        fikirlerListDiv.innerHTML = '';
-        if (fikirler.length === 0) {
-            const empty = document.createElement('div'); empty.className = 'empty-message'; empty.innerText = 'Henuz fikir yok';
-            fikirlerListDiv.appendChild(empty);
-        } else {
-            fikirler.forEach(f => {
-                const div = document.createElement('div'); div.className = 'list-item';
-                if (aktifTip === 'fikir' && aktifId === f.id) div.classList.add('active-item');
-                div.innerHTML = `<span class="item-name">${EscapeHtml(f.name)} <span class="item-badge">${f.notes.length} not</span></span><button class="delete-item" data-id="${f.id}">sil</button>`;
-                div.addEventListener('click', (e) => { if (!e.target.classList.contains('delete-item')) SetActiveFikir(f.id); });
-                div.querySelector('.delete-item').addEventListener('click', (e) => { e.stopPropagation(); DeleteFikir(f.id); });
-                fikirlerListDiv.appendChild(div);
-            });
-        }
-        
-        projelerListDiv.innerHTML = '';
-        if (projeler.length === 0) {
-            const empty = document.createElement('div'); empty.className = 'empty-message'; empty.innerText = 'Henuz proje yok';
-            projelerListDiv.appendChild(empty);
-        } else {
-            projeler.forEach(p => {
-                const div = document.createElement('div'); div.className = 'list-item';
-                if (aktifTip === 'proje' && aktifId === p.id) div.classList.add('active-item');
-                const toplamNot = p.modules.reduce((acc, m) => acc + m.notes.length, 0);
-                div.innerHTML = `<span class="item-name">${EscapeHtml(p.name)} <span class="item-badge">${p.modules.length} modul, ${toplamNot} not</span></span><button class="delete-item" data-id="${p.id}">sil</button>`;
-                div.addEventListener('click', (e) => { if (!e.target.classList.contains('delete-item')) SetActiveProje(p.id); });
-                div.querySelector('.delete-item').addEventListener('click', (e) => { e.stopPropagation(); DeleteProje(p.id); });
-                projelerListDiv.appendChild(div);
-            });
-        }
-    }
-    
-    function RenderModuleTabs() {
-        moduleTabsContainer.innerHTML = '';
-        if (aktifTip !== 'proje') return;
-        const proje = projeler.find(p => p.id === aktifId);
-        if (!proje) return;
-        proje.modules.forEach(mod => {
-            const btn = document.createElement('button');
-            btn.className = 'module-tab';
-            if (aktifModulId === mod.id) btn.classList.add('active-tab');
-            btn.innerHTML = `${EscapeHtml(mod.name)} <button class="delete-module-btn" data-id="${mod.id}">X</button>`;
-            btn.onclick = (e) => { if (!e.target.classList.contains('delete-module-btn')) SetActiveModul(mod.id); };
-            const delBtn = btn.querySelector('.delete-module-btn');
-            delBtn.addEventListener('click', (e) => { e.stopPropagation(); DeleteModule(mod.id); });
-            moduleTabsContainer.appendChild(btn);
-        });
-        const addBtn = document.createElement('button');
-        addBtn.className = 'add-module-btn';
-        addBtn.innerHTML = '+ Modul ekle';
-        addBtn.onclick = () => AddNewModule();
-        moduleTabsContainer.appendChild(addBtn);
-    }
-    
-    function SelectCard(cardElement, noteId) {
-        if (selectedNoteIds.has(noteId)) {
-            selectedNoteIds.delete(noteId);
-            cardElement.classList.remove('selected-card');
-        } else {
-            document.querySelectorAll('.idea-card').forEach(c => c.classList.remove('selected-card'));
-            selectedNoteIds.clear();
-            cardElement.classList.add('selected-card');
-            selectedCardId = noteId;
-            selectedNoteIds.add(noteId);
-        }
-        
-        if (isConnectingMode && connectingFromCard) {
-            if (connectingFromCard !== noteId) {
-                AddConnection(connectingFromCard, noteId);
-                isConnectingMode = false;
-                connectingFromCard = null;
-                document.querySelectorAll('.connector-btn').forEach(btn => btn.classList.remove('active-connector'));
-                cardElement.classList.remove('selected-card');
-                selectedCardId = null;
-                selectedNoteIds.clear();
-            } else {
-                ShowToast("Ayni nota baglanti yapamazsiniz", 800);
-                isConnectingMode = false;
-                connectingFromCard = null;
-                document.querySelectorAll('.connector-btn').forEach(btn => btn.classList.remove('active-connector'));
-            }
-        }
-    }
-    
-    function StartConnecting(noteId) {
-        isConnectingMode = true;
-        connectingFromCard = noteId;
-        document.querySelectorAll('.connector-btn').forEach(btn => btn.classList.remove('active-connector'));
-        const currentBtn = document.querySelector(`.connector-btn[data-connect-id='${noteId}']`);
-        if (currentBtn) currentBtn.classList.add('active-connector');
-        ShowToast("Baglanmak istediginiz nota tiklayin", 1500);
-    }
-    
-    function RenderBoard() {
-        notesContainer.innerHTML = '';
-        if (!aktifTip || !aktifId) {
-            notesContainer.innerHTML = '<div style="color:#5a6e85; text-align:center; margin-top:80px;">Bir fikir veya proje secin</div>';
-            return;
-        }
-        
-        let notes = [];
-        if (aktifTip === 'fikir') {
-            const f = fikirler.find(fk => fk.id === aktifId);
-            if (!f) { notesContainer.innerHTML = '<div style="color:#5a6e85; text-align:center; margin-top:80px;">Fikir bulunamadi</div>'; return; }
-            notes = f.notes;
-        } else if (aktifTip === 'proje') {
-            const proje = projeler.find(p => p.id === aktifId);
-            if (!proje) { notesContainer.innerHTML = '<div style="color:#5a6e85; text-align:center; margin-top:80px;">Proje bulunamadi</div>'; return; }
-            if (!aktifModulId || !proje.modules.find(m => m.id === aktifModulId)) {
-                if (proje.modules.length > 0) { aktifModulId = proje.modules[0].id; RenderModuleTabs(); }
-                else { notesContainer.innerHTML = '<div style="color:#5a6e85; text-align:center; margin-top:80px;">Modul eklemek icin "+ Modul ekle" butonuna tiklayin</div>'; return; }
-            }
-            const modul = proje.modules.find(m => m.id === aktifModulId);
-            notes = modul.notes;
-        }
-        
-        if (notes.length === 0) {
-            notesContainer.innerHTML = '<div style="color:#5a6e85; text-align:center; margin-top:80px;">Not eklemek icin "+ Not Ekle" butonuna tiklayin</div>';
-            return;
-        }
-        
-        notes.forEach(note => RenderNoteCard(note));
-        setTimeout(() => RenderLines(), 50);
-    }
-    
-    function RenderNoteCard(note) {
-        const card = document.createElement('div'); 
-        card.className = 'idea-card'; 
-        card.setAttribute('data-note-id', note.id);
-        card.style.left = note.left + 'px'; 
-        card.style.top = note.top + 'px'; 
-        card.style.backgroundColor = note.bgColor || "#1e293b";
-        
-        if (selectedNoteIds.has(note.id)) {
-            card.classList.add('selected-card');
-        }
-        
-        card.innerHTML = `
-            <div class="card-header">
-                <span class="drag-area">::</span>
-                <input type="text" class="card-title" value="${EscapeHtml(note.title)}" placeholder="Baslik">
-                <button class="connector-btn" data-connect-id="${note.id}">+</button>
-                <button class="delete-card">X</button>
-            </div>
-            <textarea class="card-content" placeholder="Not detayi...">${EscapeHtml(note.content)}</textarea>
-            <div class="color-selector" id="ColorSelector-${note.id}"></div>
-        `;
-        
-        const connectionPoints = ['top', 'bottom', 'left', 'right'];
-        connectionPoints.forEach(pos => {
-            const point = document.createElement('div');
-            point.className = `connection-point ${pos}`;
-            point.title = pos + " baglanti noktasi";
-            point.addEventListener('click', (e) => {
-                e.stopPropagation();
-                StartConnecting(note.id);
-            });
-            card.appendChild(point);
-        });
-        
-        const titleInp = card.querySelector('.card-title'); 
-        const contentArea = card.querySelector('.card-content'); 
-        const delBtn = card.querySelector('.delete-card');
-        const connectorBtn = card.querySelector('.connector-btn');
-        
-        connectorBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            StartConnecting(note.id);
-        });
-        
-        titleInp.addEventListener('change', () => { 
-            note.title = titleInp.value; 
-            SaveToDB();
-            RenderLines();
-        });
-        
-        contentArea.addEventListener('change', () => { 
-            note.content = contentArea.value; 
-            SaveToDB();
-        });
-        
-        delBtn.addEventListener('click', (e) => { 
-            e.stopPropagation(); 
-            DeleteNote(note.id); 
-        });
-        
-        const colorDiv = card.querySelector(`#ColorSelector-${note.id}`);
-        colorPalette.forEach(color => {
-            const dot = document.createElement('div'); 
-            dot.className = 'color-option'; 
-            dot.style.backgroundColor = color;
-            dot.style.border = note.bgColor === color ? '2px solid white' : '1px solid rgba(255,255,255,0.3)';
-            dot.addEventListener('click', (e) => { 
-                e.stopPropagation(); 
-                note.bgColor = color; 
-                card.style.backgroundColor = color; 
-                colorDiv.querySelectorAll('.color-option').forEach(d => d.style.border = d.style.backgroundColor === color ? '2px solid white' : '1px solid rgba(255,255,255,0.3)'); 
-                SaveToDB(); 
-                ShowToast("Renk degistirildi", 800); 
-            });
-            colorDiv.appendChild(dot);
-        });
-        
-        card.addEventListener('click', (e) => {
-            if (!e.target.classList.contains('delete-card') && 
-                !e.target.classList.contains('connector-btn') &&
-                !e.target.classList.contains('color-option') &&
-                !e.target.classList.contains('connection-point')) {
-                SelectCard(card, note.id);
-            }
-        });
-        
-        card.addEventListener('mousedown', (e) => { 
-            if (e.target.classList.contains('delete-card') || 
-                e.target.classList.contains('card-title') || 
-                e.target.classList.contains('card-content') || 
-                e.target.classList.contains('color-option') ||
-                e.target.classList.contains('connector-btn') ||
-                e.target.classList.contains('connection-point')) return; 
-            e.preventDefault(); 
-            StartDrag(e, card, note); 
-        });
-        
-        notesContainer.appendChild(card);
-    }
-    
-    let DragActive = false, DragCard = null, DragNote = null, StartX, StartY, StartLeft, StartTop;
-    function StartDrag(e, cardElement, noteObj) {
-        const rect = cardElement.getBoundingClientRect(); 
-        const containerRect = notesContainer.getBoundingClientRect();
-        DragActive = true; 
-        DragCard = cardElement; 
-        DragNote = noteObj;
-        StartX = e.clientX; 
-        StartY = e.clientY; 
-        StartLeft = rect.left - containerRect.left; 
-        StartTop = rect.top - containerRect.top;
-        document.body.style.userSelect = 'none'; 
-        cardElement.style.cursor = 'grabbing';
-        
-        const onMove = (moveEvent) => {
-            if (!DragActive) return; 
-            moveEvent.preventDefault();
-            let dx = moveEvent.clientX - StartX, dy = moveEvent.clientY - StartY;
-            let newLeft = StartLeft + dx, newTop = StartTop + dy;
-            const parentRect = notesContainer.getBoundingClientRect();
-            const maxX = parentRect.width - DragCard.offsetWidth, maxY = parentRect.height - DragCard.offsetHeight;
-            newLeft = Math.min(Math.max(newLeft, 5), Math.max(maxX, 5));
-            newTop = Math.min(Math.max(newTop, 5), Math.max(maxY, 5));
-            DragCard.style.left = newLeft + 'px'; 
-            DragCard.style.top = newTop + 'px';
-            if (DragNote) { 
-                DragNote.left = newLeft; 
-                DragNote.top = newTop; 
-            }
-            RenderLines();
-        };
-        
-        const onUp = () => { 
-            if (DragActive) { 
-                DragActive = false; 
-                document.body.style.userSelect = ''; 
-                if (DragCard) DragCard.style.cursor = 'grab'; 
-                document.removeEventListener('mousemove', onMove); 
-                document.removeEventListener('mouseup', onUp); 
-                SaveToDB(); 
-                RenderLines();
-            } 
-        };
-        document.addEventListener('mousemove', onMove); 
-        document.addEventListener('mouseup', onUp);
-    }
-    
-    function ShowTrashModal() {
-        if (trashBin.length === 0) {
-            const modal = document.createElement('div'); modal.className = 'modal-overlay';
-            modal.innerHTML = `<div class="modal-container"><h3>Cop Kutusu</h3><div class="empty-trash">Cop kutusu bos</div><div class="modal-buttons"><button class="modal-btn modal-btn-cancel" id="CloseModal">Kapat</button></div></div>`;
-            document.body.appendChild(modal);
-            modal.querySelector('#CloseModal').onclick = () => modal.remove();
-            return;
-        }
-        const modal = document.createElement('div'); modal.className = 'modal-overlay';
-        modal.innerHTML = `<div class="modal-container" style="width: 550px;"><h3>Cop Kutusu</h3><div class="trash-list" id="TrashListModal"></div><div class="modal-buttons" style="justify-content: space-between;"><div><button class="modal-btn modal-btn-cancel" id="SelectAllBtn">Tumunu Sec</button></div><div style="display: flex; gap: 8px;"><button class="modal-btn modal-btn-confirm" id="RestoreSelectedBtn">Geri Yukle</button><button class="modal-btn modal-btn-danger" id="DeleteSelectedBtn">Kalici Sil</button><button class="modal-btn modal-btn-cancel" id="CloseTrashBtn">Kapat</button></div></div></div>`;
-        document.body.appendChild(modal);
-        const listDiv = modal.querySelector('#TrashListModal');
-        let selected = new Array(trashBin.length).fill(false);
-        function RenderList() {
-            listDiv.innerHTML = '';
-            trashBin.forEach((item, idx) => {
-                const div = document.createElement('div'); div.className = 'trash-item'; if (selected[idx]) div.classList.add('selected');
-                div.innerHTML = `<input type="checkbox" class="trash-checkbox" ${selected[idx] ? 'checked' : ''}><div class="trash-info"><div class="trash-name">${EscapeHtml(item.name)}</div><div class="trash-meta"><span class="trash-badge">${item.type}</span> - ${item.parentName} - ${new Date(item.deletedAt).toLocaleDateString()}</div></div>`;
-                const chk = div.querySelector('.trash-checkbox');
-                chk.onchange = (e) => { selected[idx] = e.target.checked; if (e.target.checked) div.classList.add('selected'); else div.classList.remove('selected'); };
-                div.onclick = (e) => { if (e.target !== chk) { chk.checked = !chk.checked; selected[idx] = chk.checked; if (chk.checked) div.classList.add('selected'); else div.classList.remove('selected'); } };
-                listDiv.appendChild(div);
-            });
-        }
-        RenderList();
-        modal.querySelector('#SelectAllBtn').onclick = () => { selected.fill(true); RenderList(); };
-        modal.querySelector('#RestoreSelectedBtn').onclick = () => {
-            const indices = selected.map((v, i) => v ? i : -1).filter(i => i !== -1);
-            if (indices.length === 0) { ShowToast("Lutfen oge secin", 1000); return; }
-            RestoreFromTrash(indices);
-            modal.remove(); 
-            ShowToast(indices.length + " oge geri yuklendi", 1500);
-        };
-        modal.querySelector('#DeleteSelectedBtn').onclick = () => {
-            const indices = selected.map((v, i) => v ? i : -1).filter(i => i !== -1).reverse();
-            if (indices.length === 0) { ShowToast("Lutfen oge secin", 1000); return; }
-            if (confirm(indices.length + " ogeyi kalici olarak silmek istiyor musunuz?")) {
-                indices.forEach(i => trashBin.splice(i, 1));
-                SaveToDB(); modal.remove(); ShowToast(indices.length + " oge kalici olarak silindi", 1500);
-            }
-        };
-        modal.querySelector('#CloseTrashBtn').onclick = () => modal.remove();
-    }
-    
-    function EscapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
-    
-    document.getElementById('AddFikirBtn').addEventListener('click', AddNewFikir);
-    document.getElementById('AddProjeBtn').addEventListener('click', AddNewProje);
-    document.getElementById('AddNoteToActiveBtn').addEventListener('click', AddNoteToActive);
-    document.getElementById('TrashBinBtn').addEventListener('click', ShowTrashModal);
-    document.getElementById('EnableLineEditBtn').addEventListener('click', EnableLineEditMode);
-    
-    window.addEventListener('resize', () => {
-        RenderBoard();
-        setTimeout(() => RenderLines(), 100);
+// ── DB ──
+const DB_NAME = 'BlackBoardDB_v2';
+const DB_VERSION = 1;
+const STORE_NAME = 'appData';
+let db = null;
+
+// ── STATE ──
+let fikirler = [];
+let projeler = [];
+let aktifTip = null, aktifId = null, aktifModulId = null;
+let trashBin = [];
+let connections = [], lineColors = {}, lineWidths = {};
+let nextFikirId=1, nextProjeId=1, nextModulId=1, nextNoteId=100, nextTrashId=1, nextConnectionId=1;
+let selectedNoteIds = new Set();
+let isConnectingMode = false, connectingFromCard = null;
+let isLineEditMode = false, selectedLineIds = new Set();
+let isSelecting = false, selectionStart={x:0,y:0}, selectionRect=null;
+
+// ── UNDO ──
+const undoStack = [];
+const MAX_UNDO = 50;
+function pushUndo() {
+    const snapshot = JSON.stringify({ fikirler, projeler, aktifTip, aktifId, aktifModulId, trashBin, connections, lineColors, lineWidths, nextFikirId, nextProjeId, nextModulId, nextNoteId, nextTrashId, nextConnectionId });
+    undoStack.push(snapshot);
+    if (undoStack.length > MAX_UNDO) undoStack.shift();
+}
+function performUndo() {
+    if (undoStack.length === 0) { ShowToast("Geri alınacak işlem yok", 1200); return; }
+    const snapshot = JSON.parse(undoStack.pop());
+    fikirler = snapshot.fikirler || [];
+    projeler = snapshot.projeler || [];
+    aktifTip = snapshot.aktifTip;
+    aktifId = snapshot.aktifId;
+    aktifModulId = snapshot.aktifModulId;
+    trashBin = snapshot.trashBin || [];
+    connections = snapshot.connections || [];
+    lineColors = snapshot.lineColors || {};
+    lineWidths = snapshot.lineWidths || {};
+    nextFikirId = snapshot.nextFikirId || 1;
+    nextProjeId = snapshot.nextProjeId || 1;
+    nextModulId = snapshot.nextModulId || 1;
+    nextNoteId = snapshot.nextNoteId || 100;
+    nextTrashId = snapshot.nextTrashId || 1;
+    nextConnectionId = snapshot.nextConnectionId || 1;
+    RenderSidebar(); RenderModuleTabs(); RenderBoard();
+    SaveToDB(); ShowUndoHint();
+}
+function ShowUndoHint() {
+    const el = document.getElementById('UndoHint');
+    el.style.opacity = '1';
+    setTimeout(() => el.style.opacity = '0', 1500);
+}
+
+// ── UNSAVED INDICATOR ──
+let hasUnsaved = false;
+let saveTimer = null;
+function MarkUnsaved() {
+    hasUnsaved = true;
+    document.getElementById('SaveDot').classList.add('unsaved');
+    document.getElementById('SaveText').textContent = 'Kaydedilmedi';
+}
+function MarkSaved() {
+    hasUnsaved = false;
+    document.getElementById('SaveDot').classList.remove('unsaved');
+    document.getElementById('SaveText').textContent = 'Kaydedildi';
+}
+function DebounceSave() {
+    MarkUnsaved();
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => SaveToDB(), 1500);
+}
+
+const colorPalette = ["#1e293b","#2d1b36","#1a2e3a","#2a2a35","#1e3a4d","#2c2a3e","#1f3a3f","#3b2f2f","#2f3b2f"];
+const lineColorsList = ["#60a5fa","#f59e0b","#10b981","#ef4444","#a855f7","#ec489a","#14b8a6","#f97316","#8b5cf6"];
+
+const fikirlerListDiv = document.getElementById('fikirlerList');
+const projelerListDiv = document.getElementById('projelerList');
+const notesContainer = document.getElementById('NotesContainer');
+const whiteboardCanvas = document.getElementById('WhiteboardCanvas');
+const activeTitleSpan = document.getElementById('ActiveTitle');
+const moduleTabsContainer = document.getElementById('ModuleTabsContainer');
+const lineEditorContainer = document.getElementById('LineEditorContainer');
+const toastEl = document.getElementById('ToastMsg');
+const linesSvg = document.getElementById('LinesSvg');
+
+function ShowToast(msg, dur=1400) {
+    toastEl.style.opacity='1'; toastEl.innerText=msg;
+    setTimeout(()=>toastEl.style.opacity='0', dur);
+}
+function EscapeHtml(str) {
+    if(!str) return '';
+    return str.replace(/[&<>'"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));
+}
+function GetRandomPosition() {
+    const rect = notesContainer.getBoundingClientRect();
+    const w = rect.width||900, h=rect.height||500;
+    return { left: Math.min(Math.max(50+Math.random()*(w-300),20),w-270), top: Math.min(Math.max(50+Math.random()*(h-250),20),h-200) };
+}
+
+// ── DB ──
+function InitDB() {
+    return new Promise((res,rej)=>{
+        const req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onerror=()=>rej(req.error);
+        req.onsuccess=()=>{db=req.result;res();};
+        req.onupgradeneeded=(e)=>{if(!e.target.result.objectStoreNames.contains(STORE_NAME)) e.target.result.createObjectStore(STORE_NAME);};
     });
-    
-    async function StartApp() { 
-        await InitDB(); 
-        await LoadFromDB(); 
-        RenderSidebar(); 
-        RenderModuleTabs(); 
-        RenderLineEditorBar();
-        initSelection();
-        if (aktifTip === 'fikir' && fikirler.find(f=>f.id===aktifId)) SetActiveFikir(aktifId); 
-        else if (aktifTip === 'proje' && projeler.find(p=>p.id===aktifId)) SetActiveProje(aktifId); 
-        else if (fikirler.length > 0) SetActiveFikir(fikirler[0].id); 
-        else if (projeler.length > 0) SetActiveProje(projeler[0].id); 
-        else RenderBoard(); 
+}
+async function SaveToDB() {
+    if(!db) return;
+    const data={fikirler,projeler,aktifTip,aktifId,aktifModulId,trashBin,nextFikirId,nextProjeId,nextModulId,nextNoteId,nextTrashId,nextConnectionId,connections,lineColors,lineWidths};
+    const tx=db.transaction(STORE_NAME,'readwrite');
+    tx.objectStore(STORE_NAME).put(data,'mainData');
+    MarkSaved();
+}
+async function LoadFromDB() {
+    if(!db) return;
+    const tx=db.transaction(STORE_NAME,'readonly');
+    return new Promise((res)=>{
+        const req=tx.objectStore(STORE_NAME).get('mainData');
+        req.onsuccess=()=>{
+            const d=req.result;
+            if(d){
+                fikirler=d.fikirler||[]; projeler=d.projeler||[];
+                aktifTip=d.aktifTip||null; aktifId=d.aktifId||null; aktifModulId=d.aktifModulId||null;
+                trashBin=d.trashBin||[]; connections=d.connections||[];
+                lineColors=d.lineColors||{}; lineWidths=d.lineWidths||{};
+                nextFikirId=d.nextFikirId||1; nextProjeId=d.nextProjeId||1;
+                nextModulId=d.nextModulId||1; nextNoteId=d.nextNoteId||100;
+                nextTrashId=d.nextTrashId||1; nextConnectionId=d.nextConnectionId||1;
+            } else CreateInitialData();
+            res();
+        };
+        req.onerror=()=>{CreateInitialData();res();};
+    });
+}
+function CreateInitialData() {
+    const note1 = { id:nextNoteId++, title:"Mobil Uygulama Fikri", type:"text", blocks:[{type:"text",id:1,content:"Kullanıcı dostu arayüz ile hızlı not alma"}], left:80, top:70, bgColor:"#1e293b" };
+    fikirler=[{id:nextFikirId++, name:"Mobil Uygulama", notes:[note1]}];
+    const note2 = { id:nextNoteId++, title:"Başlangıç Adımları", type:"steps", blocks:[{type:"steps",id:1,items:[{id:1,text:"Gereksinimleri belirle"},{id:2,text:"Prototip yap"},{id:3,text:"Test et"}]}], left:100, top:80, bgColor:"#1e293b" };
+    const note3 = { id:nextNoteId++, title:"Kontrol Listesi", type:"checklist", blocks:[{type:"checklist",id:1,items:[{id:1,text:"PID kontrol",done:false},{id:2,text:"Sensor füzyonu",done:true}]}], left:420, top:130, bgColor:"#1e3a4d" };
+    const modul1={id:nextModulId++, name:"Ana Modül", notes:[note2]};
+    const modul2={id:nextModulId++, name:"Algoritmalar", notes:[note3]};
+    projeler=[{id:nextProjeId++, name:"Drone Projesi", modules:[modul1,modul2]}];
+    aktifTip='fikir'; aktifId=fikirler[0].id; aktifModulId=null;
+    connections=[]; lineColors={}; lineWidths={};
+}
+
+// ── MODAL ──
+function ShowModal(title, placeholder, onConfirm, defaultValue="", confirmLabel="Ekle") {
+    const modal=document.createElement('div'); modal.className='modal-overlay';
+    modal.innerHTML=`<div class="modal-container"><h3>${title}</h3><input type="text" class="modal-input" id="MI" placeholder="${placeholder}" value="${EscapeHtml(defaultValue)}"><div class="modal-buttons"><button class="modal-btn modal-btn-cancel" id="MC">İptal</button><button class="modal-btn modal-btn-confirm" id="MK">${confirmLabel}</button></div></div>`;
+    document.body.appendChild(modal);
+    const inp=modal.querySelector('#MI'); inp.focus(); inp.select();
+    modal.querySelector('#MC').onclick=()=>modal.remove();
+    modal.querySelector('#MK').onclick=()=>{const v=inp.value.trim();if(v){onConfirm(v);}modal.remove();};
+    inp.addEventListener('keypress',(e)=>{if(e.key==='Enter')modal.querySelector('#MK').click();});
+}
+
+// ── BLOCK HELPERS ──
+function MakeBlock(type) {
+    const blockId = Date.now() + Math.random();
+    if (type==='text') return {type:'text', id:blockId, content:''};
+    if (type==='checklist') return {type:'checklist', id:blockId, items:[{id:Date.now(),text:'',done:false}]};
+    if (type==='steps') return {type:'steps', id:blockId, items:[{id:Date.now(),text:''}]};
+    if (type==='code') return {type:'code', id:blockId, lang:'python', content:''};
+    if (type==='link') return {type:'link', id:blockId, url:'', label:''};
+    return null;
+}
+function EnsureBlocks(note) {
+    if (!note.blocks) {
+        note.blocks = [];
+        if (note.content) note.blocks.push({type:'text',id:Date.now(),content:note.content||''});
+        delete note.content;
     }
-    StartApp();
+    if (note.blocks.length === 0) note.blocks.push(MakeBlock('text'));
+}
+
+// ── RENDER BLOCK (inline in card) ──
+function RenderBlockElement(block, note, isExpand) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'block';
+    wrapper.setAttribute('data-block-id', block.id);
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'block-delete-btn';
+    delBtn.title = 'Bloğu sil';
+    delBtn.innerHTML = '✕';
+    delBtn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        pushUndo();
+        note.blocks = note.blocks.filter(b=>b.id!==block.id);
+        if(note.blocks.length===0) note.blocks.push(MakeBlock('text'));
+        DebounceSave();
+        if(isExpand) return; // expand modal re-renders itself
+        RenderBoard();
+    });
+
+    if (block.type==='text') {
+        wrapper.classList.add('block-text');
+        const ta = document.createElement('textarea');
+        ta.value = block.content||'';
+        ta.placeholder = 'Notunu yaz...';
+        ta.style.userSelect = 'text';
+        ta.addEventListener('input', ()=>{ block.content=ta.value; DebounceSave(); });
+        ta.addEventListener('mousedown', e=>e.stopPropagation());
+        wrapper.appendChild(ta);
+    }
+    else if (block.type==='checklist') {
+        wrapper.classList.add('block-checklist');
+        const renderItems = () => {
+            wrapper.innerHTML='';
+            block.items.forEach((item,idx)=>{
+                const row=document.createElement('div'); row.className='checklist-item';
+                const cb=document.createElement('input'); cb.type='checkbox'; cb.className='checklist-cb'; cb.checked=item.done;
+                cb.addEventListener('change',()=>{ item.done=cb.checked; renderItems(); DebounceSave(); });
+                cb.addEventListener('mousedown',e=>e.stopPropagation());
+                const lbl=document.createElement('input'); lbl.type='text'; lbl.className='checklist-label'+(item.done?' done':'');
+                lbl.style.userSelect='text'; lbl.value=item.text;
+                lbl.placeholder='Liste maddesi...';
+                lbl.addEventListener('input',()=>{ item.text=lbl.value; DebounceSave(); });
+                lbl.addEventListener('mousedown',e=>e.stopPropagation());
+                lbl.addEventListener('keydown',(e)=>{
+                    if(e.key==='Enter'){ e.preventDefault(); block.items.splice(idx+1,0,{id:Date.now(),text:'',done:false}); renderItems(); DebounceSave(); setTimeout(()=>{ const inputs=wrapper.querySelectorAll('.checklist-label'); if(inputs[idx+1]) inputs[idx+1].focus(); },50); }
+                    if(e.key==='Backspace'&&lbl.value===''&&block.items.length>1){ e.preventDefault(); block.items.splice(idx,1); renderItems(); DebounceSave(); }
+                });
+                const dl=document.createElement('button'); dl.className='checklist-del'; dl.innerHTML='✕';
+                dl.addEventListener('click',()=>{ block.items.splice(idx,1); if(block.items.length===0) block.items.push({id:Date.now(),text:'',done:false}); renderItems(); DebounceSave(); });
+                row.appendChild(cb); row.appendChild(lbl); row.appendChild(dl);
+                wrapper.appendChild(row);
+            });
+            const addBtn=document.createElement('button'); addBtn.className='add-checklist-item'; addBtn.innerText='+ Madde ekle';
+            addBtn.addEventListener('click',()=>{ block.items.push({id:Date.now(),text:'',done:false}); renderItems(); DebounceSave(); });
+            addBtn.addEventListener('mousedown',e=>e.stopPropagation());
+            wrapper.appendChild(addBtn);
+        };
+        renderItems();
+    }
+    else if (block.type==='steps') {
+        wrapper.classList.add('block-steps');
+        const renderSteps = () => {
+            wrapper.innerHTML='';
+            block.items.forEach((item,idx)=>{
+                const row=document.createElement('div'); row.className='step-item';
+                const num=document.createElement('div'); num.className='step-num'; num.innerText=idx+1;
+                const ta=document.createElement('textarea'); ta.className='step-text';
+                ta.style.userSelect='text'; ta.value=item.text; ta.placeholder='Adım açıklaması...'; ta.rows=1;
+                ta.addEventListener('input',()=>{ item.text=ta.value; ta.style.height='auto'; ta.style.height=ta.scrollHeight+'px'; DebounceSave(); });
+                ta.addEventListener('mousedown',e=>e.stopPropagation());
+                ta.addEventListener('keydown',(e)=>{
+                    if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); block.items.splice(idx+1,0,{id:Date.now(),text:''}); renderSteps(); DebounceSave(); setTimeout(()=>{ const tas=wrapper.querySelectorAll('.step-text'); if(tas[idx+1]) tas[idx+1].focus(); },50); }
+                });
+                const dl=document.createElement('button'); dl.className='step-del'; dl.innerHTML='✕';
+                dl.addEventListener('click',()=>{ block.items.splice(idx,1); if(block.items.length===0) block.items.push({id:Date.now(),text:''}); renderSteps(); DebounceSave(); });
+                row.appendChild(num); row.appendChild(ta); row.appendChild(dl);
+                wrapper.appendChild(row);
+            });
+            const addBtn=document.createElement('button'); addBtn.className='add-step-item'; addBtn.innerText='+ Adım ekle';
+            addBtn.addEventListener('click',()=>{ block.items.push({id:Date.now(),text:''}); renderSteps(); DebounceSave(); });
+            addBtn.addEventListener('mousedown',e=>e.stopPropagation());
+            wrapper.appendChild(addBtn);
+        };
+        renderSteps();
+    }
+    else if (block.type==='code') {
+        wrapper.classList.add('block-code');
+        const bar=document.createElement('div'); bar.className='code-lang-bar';
+        const langs=['python','javascript','c','cpp','rust','go','bash','json','yaml','other'];
+        const sel=document.createElement('select'); sel.className='code-lang-select';
+        langs.forEach(l=>{ const o=document.createElement('option'); o.value=l; o.text=l; if(l===block.lang) o.selected=true; sel.appendChild(o); });
+        sel.addEventListener('change',()=>{ block.lang=sel.value; DebounceSave(); });
+        sel.addEventListener('mousedown',e=>e.stopPropagation());
+        const copyBtn=document.createElement('button'); copyBtn.className='code-copy-btn'; copyBtn.innerText='Kopyala';
+        copyBtn.addEventListener('click',()=>{ navigator.clipboard.writeText(ta.value).then(()=>ShowToast("Kod kopyalandı",900)); });
+        copyBtn.addEventListener('mousedown',e=>e.stopPropagation());
+        bar.appendChild(sel); bar.appendChild(copyBtn);
+        const ta=document.createElement('textarea');
+        ta.style.userSelect='text'; ta.value=block.content||''; ta.placeholder='// Kodunu buraya yaz...';
+        ta.addEventListener('input',()=>{ block.content=ta.value; DebounceSave(); });
+        ta.addEventListener('mousedown',e=>e.stopPropagation());
+        ta.addEventListener('keydown',(e)=>{ if(e.key==='Tab'){ e.preventDefault(); const s=ta.selectionStart,en=ta.selectionEnd; ta.value=ta.value.substring(0,s)+'    '+ta.value.substring(en); ta.selectionStart=ta.selectionEnd=s+4; } });
+        wrapper.appendChild(bar); wrapper.appendChild(ta);
+    }
+    else if (block.type==='link') {
+        wrapper.classList.add('block-link');
+        const urlInp=document.createElement('input'); urlInp.type='url'; urlInp.className='link-url-inp';
+        urlInp.style.userSelect='text'; urlInp.value=block.url||''; urlInp.placeholder='https://...';
+        urlInp.addEventListener('input',()=>{ block.url=urlInp.value; DebounceSave(); });
+        urlInp.addEventListener('mousedown',e=>e.stopPropagation());
+        const lblInp=document.createElement('input'); lblInp.type='text'; lblInp.className='link-label-inp';
+        lblInp.style.userSelect='text'; lblInp.value=block.label||''; lblInp.placeholder='Bağlantı açıklaması...';
+        lblInp.addEventListener('input',()=>{ block.label=lblInp.value; DebounceSave(); });
+        lblInp.addEventListener('mousedown',e=>e.stopPropagation());
+        if (block.url) {
+            const openBtn=document.createElement('a'); openBtn.href=block.url; openBtn.target='_blank';
+            openBtn.style.cssText='display:block;font-size:0.68rem;color:#60a5fa;margin-top:5px;text-decoration:none;';
+            openBtn.innerText='↗ Aç';
+            wrapper.appendChild(urlInp); wrapper.appendChild(lblInp); wrapper.appendChild(openBtn);
+        } else {
+            wrapper.appendChild(urlInp); wrapper.appendChild(lblInp);
+        }
+    }
+
+    wrapper.appendChild(delBtn);
+    return wrapper;
+}
+
+// ── ADD BLOCK BAR ──
+function MakeAddBlockBar(note, isExpand, container) {
+    const bar = document.createElement('div');
+    bar.className = isExpand ? 'expand-addbar' : 'card-addblock-bar';
+    const types = [['text','📝 Metin'],['checklist','☑ Liste'],['steps','🔢 Adımlar'],['code','</> Kod'],['link','🔗 Link']];
+    types.forEach(([t,label])=>{
+        const btn=document.createElement('button'); btn.className='addblock-btn'; btn.innerText=label;
+        btn.addEventListener('mousedown',e=>e.stopPropagation());
+        btn.addEventListener('click',(e)=>{
+            e.stopPropagation();
+            pushUndo();
+            const block=MakeBlock(t);
+            note.blocks.push(block);
+            DebounceSave();
+            if(isExpand) {
+                // re-render blocks in expand modal
+                RenderExpandBlocks(note, container);
+            } else {
+                RenderBoard();
+            }
+        });
+        bar.appendChild(btn);
+    });
+    return bar;
+}
+
+function RenderExpandBlocks(note, blocksContainer) {
+    blocksContainer.innerHTML='';
+    note.blocks.forEach(block=>{
+        blocksContainer.appendChild(RenderBlockElement(block, note, true));
+    });
+}
+
+// ── EXPAND MODAL ──
+function OpenExpandModal(note) {
+    EnsureBlocks(note);
+    const overlay=document.createElement('div'); overlay.className='expand-overlay';
+    const typeLabels={text:'Metin',checklist:'Liste',steps:'Adımlar',code:'Kod',link:'Link',mixed:'Karma'};
+    overlay.innerHTML=`
+        <div class="expand-container">
+            <div class="expand-header">
+                <input class="expand-title-inp" value="${EscapeHtml(note.title)}" placeholder="Başlık..." style="user-select:text;">
+                <span class="expand-type">${note.type||'Not'}</span>
+                <button class="expand-close" id="ExCl">✕</button>
+            </div>
+            <div class="expand-body" id="ExBody"></div>
+            <div id="ExAddBar"></div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    const titleInp=overlay.querySelector('.expand-title-inp');
+    titleInp.addEventListener('input',()=>{ note.title=titleInp.value; DebounceSave(); });
+    const exBody=overlay.querySelector('#ExBody');
+    RenderExpandBlocks(note, exBody);
+    overlay.querySelector('#ExAddBar').appendChild(MakeAddBlockBar(note, true, exBody));
+    overlay.querySelector('#ExCl').onclick=()=>{ overlay.remove(); RenderBoard(); };
+    overlay.addEventListener('click',(e)=>{ if(e.target===overlay) { overlay.remove(); RenderBoard(); } });
+}
+
+// ── NOTE CARD ──
+function RenderNoteCard(note) {
+    EnsureBlocks(note);
+    const card=document.createElement('div');
+    card.className='idea-card';
+    card.setAttribute('data-note-id', note.id);
+    card.style.left=note.left+'px'; card.style.top=note.top+'px';
+    card.style.backgroundColor=note.bgColor||'#141a24';
+    if(selectedNoteIds.has(note.id)) card.classList.add('selected-card');
+
+    // Titlebar
+    const titlebar=document.createElement('div'); titlebar.className='card-titlebar';
+    titlebar.innerHTML=`<span class="drag-area">::</span>`;
+    const titleInp=document.createElement('input'); titleInp.type='text'; titleInp.className='card-title';
+    titleInp.value=note.title||''; titleInp.placeholder='Başlık'; titleInp.style.userSelect='text';
+    titleInp.addEventListener('change',()=>{ note.title=titleInp.value; DebounceSave(); RenderLines(); });
+    titleInp.addEventListener('mousedown',e=>e.stopPropagation());
+    const connBtn=document.createElement('button'); connBtn.className='connector-btn'; connBtn.setAttribute('data-connect-id',note.id); connBtn.title='Bağlantı kur'; connBtn.innerHTML='⊕';
+    connBtn.addEventListener('click',(e)=>{ e.stopPropagation(); StartConnecting(note.id); });
+    connBtn.addEventListener('mousedown',e=>e.stopPropagation());
+    const delBtn=document.createElement('button'); delBtn.className='delete-card'; delBtn.innerHTML='✕'; delBtn.title='Notu sil';
+    delBtn.addEventListener('click',(e)=>{ e.stopPropagation(); pushUndo(); DeleteNote(note.id); });
+    delBtn.addEventListener('mousedown',e=>e.stopPropagation());
+    titlebar.appendChild(titleInp); titlebar.appendChild(connBtn); titlebar.appendChild(delBtn);
+    card.appendChild(titlebar);
+
+    // Body (first block only for compact view, or first 2)
+    const body=document.createElement('div'); body.className='card-body';
+    const displayBlocks=note.blocks.slice(0,2);
+    displayBlocks.forEach(block=>body.appendChild(RenderBlockElement(block, note, false)));
+    if(note.blocks.length>2){
+        const more=document.createElement('div'); more.style.cssText='color:#5a6e85;font-size:0.65rem;padding:4px 8px;';
+        more.innerText=`+ ${note.blocks.length-2} blok daha...`;
+        body.appendChild(more);
+    }
+    card.appendChild(body);
+
+    // Add block bar (compact)
+    card.appendChild(MakeAddBlockBar(note, false, null));
+
+    // Footer
+    const footer=document.createElement('div'); footer.className='card-footer';
+    const colorSel=document.createElement('div'); colorSel.className='color-selector';
+    colorPalette.forEach(color=>{
+        const dot=document.createElement('div'); dot.className='color-option';
+        dot.style.backgroundColor=color;
+        dot.style.border=note.bgColor===color?'2px solid #fff':'1px solid rgba(255,255,255,0.2)';
+        dot.addEventListener('mousedown',e=>e.stopPropagation());
+        dot.addEventListener('click',(e)=>{
+            e.stopPropagation();
+            note.bgColor=color; card.style.backgroundColor=color;
+            colorSel.querySelectorAll('.color-option').forEach(d=>d.style.border=d.style.backgroundColor===color?'2px solid #fff':'1px solid rgba(255,255,255,0.2)');
+            DebounceSave();
+        });
+        colorSel.appendChild(dot);
+    });
+    const expandBtn=document.createElement('button'); expandBtn.className='expand-card-btn'; expandBtn.innerText='Genişlet ↗';
+    expandBtn.addEventListener('mousedown',e=>e.stopPropagation());
+    expandBtn.addEventListener('click',(e)=>{ e.stopPropagation(); OpenExpandModal(note); });
+    footer.appendChild(colorSel); footer.appendChild(expandBtn);
+    card.appendChild(footer);
+
+    // Connection points
+    ['top','bottom','left','right'].forEach(pos=>{
+        const pt=document.createElement('div'); pt.className=`connection-point ${pos}`;
+        pt.addEventListener('click',(e)=>{ e.stopPropagation(); StartConnecting(note.id); });
+        card.appendChild(pt);
+    });
+
+    card.addEventListener('click',(e)=>{
+        if(e.target.closest('.delete-card')||e.target.closest('.connector-btn')||e.target.closest('.color-option')||e.target.closest('.connection-point')||e.target.closest('.expand-card-btn')||e.target.closest('.addblock-btn')||e.target.closest('.block')) return;
+        SelectCard(card, note.id);
+    });
+    card.addEventListener('mousedown',(e)=>{
+        if(e.target.closest('.delete-card')||e.target.closest('.card-title')||e.target.closest('.block')||e.target.closest('.connector-btn')||e.target.closest('.connection-point')||e.target.closest('.color-option')||e.target.closest('.expand-card-btn')||e.target.closest('.addblock-btn')) return;
+        e.preventDefault();
+        StartDrag(e, card, note);
+    });
+
+    notesContainer.appendChild(card);
+}
+
+// ── DRAG ──
+let DragActive=false, DragCard=null, DragNote=null, StartX, StartY, StartLeft, StartTop;
+function StartDrag(e, cardEl, noteObj) {
+    const r=cardEl.getBoundingClientRect(), cr=notesContainer.getBoundingClientRect();
+    DragActive=true; DragCard=cardEl; DragNote=noteObj;
+    StartX=e.clientX; StartY=e.clientY; StartLeft=r.left-cr.left; StartTop=r.top-cr.top;
+    document.body.style.userSelect='none'; cardEl.style.cursor='grabbing';
+    const onMove=(mv)=>{
+        if(!DragActive) return; mv.preventDefault();
+        let nl=StartLeft+(mv.clientX-StartX), nt=StartTop+(mv.clientY-StartY);
+        const pr=notesContainer.getBoundingClientRect();
+        nl=Math.min(Math.max(nl,5),Math.max(pr.width-DragCard.offsetWidth,5));
+        nt=Math.min(Math.max(nt,5),Math.max(pr.height-DragCard.offsetHeight,5));
+        DragCard.style.left=nl+'px'; DragCard.style.top=nt+'px';
+        if(DragNote){DragNote.left=nl; DragNote.top=nt;}
+        RenderLines();
+    };
+    const onUp=()=>{
+        if(DragActive){DragActive=false; document.body.style.userSelect=''; if(DragCard)DragCard.style.cursor='grab'; document.removeEventListener('mousemove',onMove); document.removeEventListener('mouseup',onUp); DebounceSave(); RenderLines();}
+    };
+    document.addEventListener('mousemove',onMove); document.addEventListener('mouseup',onUp);
+}
+
+// ── SELECT ──
+function SelectCard(cardEl, noteId) {
+    if(isConnectingMode && connectingFromCard) {
+        if(connectingFromCard!==noteId){ AddConnection(connectingFromCard,noteId); }
+        else { ShowToast("Aynı nota bağlantı yapamazsınız",800); }
+        isConnectingMode=false; connectingFromCard=null;
+        document.querySelectorAll('.connector-btn').forEach(b=>b.classList.remove('active-connector'));
+        document.querySelectorAll('.idea-card').forEach(c=>c.classList.remove('selected-card'));
+        selectedNoteIds.clear(); return;
+    }
+    document.querySelectorAll('.idea-card').forEach(c=>c.classList.remove('selected-card'));
+    selectedNoteIds.clear();
+    cardEl.classList.add('selected-card');
+    selectedNoteIds.add(noteId);
+}
+
+function StartConnecting(noteId) {
+    isConnectingMode=true; connectingFromCard=noteId;
+    document.querySelectorAll('.connector-btn').forEach(b=>b.classList.remove('active-connector'));
+    const btn=document.querySelector(`.connector-btn[data-connect-id='${noteId}']`);
+    if(btn) btn.classList.add('active-connector');
+    ShowToast("Bağlanmak istediğiniz nota tıklayın",1500);
+}
+
+// ── CONNECTIONS ──
+function AddConnection(from, to) {
+    if(from===to){ShowToast("Aynı nota bağlantı olmaz",1000); return false;}
+    if(connections.some(c=>(c.from===from&&c.to===to)||(c.from===to&&c.to===from))){ShowToast("Bu bağlantı zaten var",1000); return false;}
+    pushUndo();
+    const nid=nextConnectionId++;
+    connections.push({id:nid,from,to});
+    RenderLines(); DebounceSave(); ShowToast("Bağlantı oluşturuldu",800); return true;
+}
+function RemoveConnection(cid) {
+    pushUndo();
+    connections=connections.filter(c=>c.id!==cid);
+    delete lineColors[cid]; delete lineWidths[cid]; selectedLineIds.delete(cid);
+    RenderLines(); DebounceSave(); ShowToast("Bağlantı kaldırıldı",800);
+}
+function RemoveConnectionsForNote(noteId) {
+    const toDelete=connections.filter(c=>c.from===noteId||c.to===noteId);
+    toDelete.forEach(c=>{ delete lineColors[c.id]; delete lineWidths[c.id]; selectedLineIds.delete(c.id); });
+    connections=connections.filter(c=>c.from!==noteId&&c.to!==noteId);
+    RenderLines(); DebounceSave();
+}
+function RenderLines() {
+    linesSvg.innerHTML='';
+    connections.forEach(conn=>{
+        const fc=document.querySelector(`.idea-card[data-note-id='${conn.from}']`);
+        const tc=document.querySelector(`.idea-card[data-note-id='${conn.to}']`);
+        if(!fc||!tc) return;
+        const fr=fc.getBoundingClientRect(), tr=tc.getBoundingClientRect();
+        const cr=notesContainer.getBoundingClientRect();
+        const x1=fr.left+fr.width/2-cr.left, y1=fr.top+fr.height/2-cr.top;
+        const x2=tr.left+tr.width/2-cr.left, y2=tr.top+tr.height/2-cr.top;
+        const color=lineColors[conn.id]||'#60a5fa';
+        const width=lineWidths[conn.id]||3;
+        const isSel=isLineEditMode&&selectedLineIds.has(conn.id);
+        const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+        line.setAttribute('x1',x1); line.setAttribute('y1',y1);
+        line.setAttribute('x2',x2); line.setAttribute('y2',y2);
+        line.setAttribute('stroke', isSel?'#f59e0b':color);
+        line.setAttribute('stroke-width', isSel?width+3:width);
+        line.setAttribute('stroke-dasharray','6,4');
+        line.style.cursor='pointer'; line.style.pointerEvents='stroke';
+        line.addEventListener('click',(e)=>{
+            e.stopPropagation();
+            if(isLineEditMode) ToggleLineSelection(conn.id);
+            else if(confirm('Bu bağlantıyı silmek istiyor musunuz?')) RemoveConnection(conn.id);
+        });
+        linesSvg.appendChild(line);
+    });
+}
+
+// ── LINE EDIT MODE ──
+function EnableLineEditMode() {
+    if(connections.length===0){ShowToast("Düzenlenecek çizgi yok",1500);return;}
+    isLineEditMode=true; selectedLineIds.clear(); RenderLineEditorBar(); RenderLines();
+    ShowToast("Çizgi düzenleme modu aktif",1800);
+}
+function DisableLineEditMode() {
+    isLineEditMode=false; selectedLineIds.clear(); RenderLineEditorBar(); RenderLines();
+}
+function ToggleLineSelection(lid) {
+    if(selectedLineIds.has(lid)) selectedLineIds.delete(lid); else selectedLineIds.add(lid);
+    RenderLineEditorBar(); RenderLines();
+}
+function ApplyColorToSelected(color) {
+    if(selectedLineIds.size===0){ShowToast("Önce çizgi seçin",1000);return;}
+    selectedLineIds.forEach(id=>lineColors[id]=color); RenderLines(); DebounceSave();
+    ShowToast(selectedLineIds.size+" çizginin rengi değiştirildi",1000);
+}
+function ApplyStrokeToSelected(w) {
+    if(selectedLineIds.size===0){ShowToast("Önce çizgi seçin",1000);return;}
+    selectedLineIds.forEach(id=>lineWidths[id]=w); RenderLines(); DebounceSave();
+}
+function DeleteSelectedLines() {
+    if(selectedLineIds.size===0){ShowToast("Silinecek çizgi seçin",1000);return;}
+    if(!confirm(selectedLineIds.size+" çizgiyi silmek istiyor musunuz?")) return;
+    pushUndo();
+    connections=connections.filter(c=>!selectedLineIds.has(c.id));
+    selectedLineIds.forEach(id=>{delete lineColors[id];delete lineWidths[id];});
+    selectedLineIds.clear(); DebounceSave(); RenderLines();
+    if(connections.length===0) DisableLineEditMode(); else RenderLineEditorBar();
+    ShowToast("Seçilen çizgiler silindi",1200);
+}
+function DeleteAllLines() {
+    if(connections.length===0){ShowToast("Silinecek çizgi yok",1000);return;}
+    if(!confirm("Tüm "+connections.length+" çizgiyi silmek istiyor musunuz?")) return;
+    pushUndo();
+    connections=[]; lineColors={}; lineWidths={}; selectedLineIds.clear();
+    DebounceSave(); RenderLines(); DisableLineEditMode(); ShowToast("Tüm çizgiler silindi",1200);
+}
+function RenderLineEditorBar() {
+    if(!isLineEditMode){lineEditorContainer.innerHTML='';return;}
+    lineEditorContainer.innerHTML=`
+        <div class="line-editor-bar">
+            <span class="line-editor-label">Çizgi Düzenleme</span>
+            <span class="selection-info">${selectedLineIds.size} seçili</span>
+            <div class="color-picker-group">${lineColorsList.map(c=>`<div class="line-color-option" style="background:${c}" data-c="${c}"></div>`).join('')}</div>
+            <div class="color-picker-group">
+                <button class="stroke-btn" data-w="2">İnce</button>
+                <button class="stroke-btn" data-w="4">Normal</button>
+                <button class="stroke-btn" data-w="6">Kalın</button>
+            </div>
+            <div class="color-picker-group">
+                <button class="line-action-btn" id="SelAllL">Tümünü Seç</button>
+                <button class="line-action-btn" id="DeSelL">Seçimi Kaldır</button>
+                <button class="line-action-btn" id="DelSelL" style="background:#b91c1c;color:#fff;">Seçilenleri Sil</button>
+                <button class="line-action-btn" id="DelAllL" style="background:#7f1d1d;color:#fff;">Tümünü Sil</button>
+            </div>
+            <button class="close-editor-btn" id="CloseLineEd">Düzenlemeyi Kapat</button>
+        </div>`;
+    document.querySelectorAll('.line-color-option').forEach(el=>el.onclick=()=>ApplyColorToSelected(el.getAttribute('data-c')));
+    document.querySelectorAll('.stroke-btn').forEach(el=>el.onclick=()=>ApplyStrokeToSelected(parseInt(el.getAttribute('data-w'))));
+    document.getElementById('SelAllL').onclick=()=>{ connections.forEach(c=>selectedLineIds.add(c.id)); RenderLineEditorBar(); RenderLines(); ShowToast(selectedLineIds.size+" çizgi seçildi",1000); };
+    document.getElementById('DeSelL').onclick=()=>{ selectedLineIds.clear(); RenderLineEditorBar(); RenderLines(); };
+    document.getElementById('DelSelL').onclick=()=>DeleteSelectedLines();
+    document.getElementById('DelAllL').onclick=()=>DeleteAllLines();
+    document.getElementById('CloseLineEd').onclick=()=>DisableLineEditMode();
+}
+
+// ── MOUSE SELECTION (cards + lines) ──
+function initSelection() {
+    selectionRect=document.getElementById('SelectionRect');
+    whiteboardCanvas.addEventListener('mousedown',(e)=>{
+        if(e.target.closest('.idea-card')||e.target.closest('.connection-point')||e.target.closest('.connector-btn')) return;
+        if(e.button!==0) return;
+        isSelecting=true;
+        const r=whiteboardCanvas.getBoundingClientRect();
+        selectionStart.x=e.clientX-r.left; selectionStart.y=e.clientY-r.top;
+        selectionRect.style.display='block';
+        selectionRect.style.left=selectionStart.x+'px'; selectionRect.style.top=selectionStart.y+'px';
+        selectionRect.style.width='0px'; selectionRect.style.height='0px';
+        selectedNoteIds.clear(); selectedLineIds.clear();
+        document.querySelectorAll('.idea-card').forEach(c=>c.classList.remove('selected-card'));
+    });
+    window.addEventListener('mousemove',(e)=>{
+        if(!isSelecting) return;
+        const r=whiteboardCanvas.getBoundingClientRect();
+        const cx=e.clientX-r.left, cy=e.clientY-r.top;
+        const l=Math.min(selectionStart.x,cx), t=Math.min(selectionStart.y,cy);
+        const w=Math.abs(cx-selectionStart.x), h=Math.abs(cy-selectionStart.y);
+        selectionRect.style.left=l+'px'; selectionRect.style.top=t+'px';
+        selectionRect.style.width=w+'px'; selectionRect.style.height=h+'px';
+    });
+    window.addEventListener('mouseup',(e)=>{
+        if(!isSelecting) return;
+        isSelecting=false;
+        const r=whiteboardCanvas.getBoundingClientRect();
+        const ex=e.clientX-r.left, ey=e.clientY-r.top;
+        const l=Math.min(selectionStart.x,ex), t=Math.min(selectionStart.y,ey);
+        const ri=Math.max(selectionStart.x,ex), b=Math.max(selectionStart.y,ey);
+        if(ri-l>5&&b-t>5) {
+            // Select cards
+            document.querySelectorAll('.idea-card').forEach(card=>{
+                const cr=card.getBoundingClientRect();
+                const cl=cr.left-r.left, ct=cr.top-r.top, crr=cr.right-r.left, cb=cr.bottom-r.top;
+                if(crr>l&&cl<ri&&cb>t&&ct<b){
+                    const nid=parseInt(card.getAttribute('data-note-id'));
+                    selectedNoteIds.add(nid); card.classList.add('selected-card');
+                }
+            });
+            // Select lines (check midpoint)
+            if(isLineEditMode) {
+                connections.forEach(conn=>{
+                    const fc=document.querySelector(`.idea-card[data-note-id='${conn.from}']`);
+                    const tc=document.querySelector(`.idea-card[data-note-id='${conn.to}']`);
+                    if(!fc||!tc) return;
+                    const fr=fc.getBoundingClientRect(), tr=tc.getBoundingClientRect();
+                    const mx=(fr.left+fr.width/2+tr.left+tr.width/2)/2-r.left;
+                    const my=(fr.top+fr.height/2+tr.top+tr.height/2)/2-r.top;
+                    if(mx>l&&mx<ri&&my>t&&my<b) selectedLineIds.add(conn.id);
+                });
+                RenderLineEditorBar(); RenderLines();
+            }
+            const total=selectedNoteIds.size+(isLineEditMode?selectedLineIds.size:0);
+            if(total>0) ShowToast(total+" öğe seçildi. Delete ile sil.",2000);
+        }
+        selectionRect.style.display='none';
+    });
+    window.addEventListener('keydown',(e)=>{
+        if(e.ctrlKey&&e.key==='z') { e.preventDefault(); performUndo(); return; }
+        if(e.key==='Delete') {
+            if(isLineEditMode&&selectedLineIds.size>0){ DeleteSelectedLines(); return; }
+            if(selectedNoteIds.size>0){
+                if(confirm(selectedNoteIds.size+" notu silmek istiyor musunuz?")){
+                    pushUndo();
+                    selectedNoteIds.forEach(nid=>DeleteNote(nid, true));
+                    selectedNoteIds.clear(); ShowToast("Seçilen notlar silindi",1000);
+                }
+            }
+        }
+        if(e.key==='Escape'){
+            selectedNoteIds.clear(); selectedLineIds.clear();
+            document.querySelectorAll('.idea-card').forEach(c=>c.classList.remove('selected-card'));
+            if(isConnectingMode){ isConnectingMode=false; connectingFromCard=null; document.querySelectorAll('.connector-btn').forEach(b=>b.classList.remove('active-connector')); }
+            if(isLineEditMode){ RenderLineEditorBar(); RenderLines(); }
+        }
+    });
+}
+
+// ── FİKİR OPS ──
+function AddNewFikir() {
+    ShowModal('Yeni Fikir','Fikir adı...',(name)=>{
+        pushUndo();
+        const f={id:nextFikirId++,name,notes:[]};
+        fikirler.push(f); RenderSidebar(); SetActiveFikir(f.id); DebounceSave();
+        ShowToast('"'+name+'" fikri eklendi');
+    });
+}
+function SetActiveFikir(fid) {
+    const f=fikirler.find(fk=>fk.id===fid); if(!f) return;
+    aktifTip='fikir'; aktifId=fid; aktifModulId=null;
+    activeTitleSpan.innerText=f.name;
+    moduleTabsContainer.innerHTML='';
+    selectedNoteIds.clear(); isConnectingMode=false; connectingFromCard=null;
+    if(isLineEditMode) DisableLineEditMode();
+    RenderSidebar(); RenderBoard(); DebounceSave();
+}
+function DeleteFikir(id) {
+    const idx=fikirler.findIndex(f=>f.id===id); if(idx===-1) return;
+    pushUndo();
+    const f=fikirler[idx];
+    f.notes.forEach(note=>trashBin.push({id:nextTrashId++,type:'not',name:note.title,parentName:f.name,deletedAt:new Date().toISOString(),originalData:note,parentId:f.id,parentType:'fikir'}));
+    trashBin.push({id:nextTrashId++,type:'fikir',name:f.name,parentName:'Genel',deletedAt:new Date().toISOString(),originalData:{name:f.name,notes:f.notes},parentId:null,parentType:null});
+    fikirler.splice(idx,1);
+    if(aktifTip==='fikir'&&aktifId===id){ if(fikirler.length>0) SetActiveFikir(fikirler[0].id); else if(projeler.length>0) SetActiveProje(projeler[0].id); else {aktifTip=null;aktifId=null;activeTitleSpan.innerText='Ana Pano';moduleTabsContainer.innerHTML='';RenderBoard();} }
+    RenderSidebar(); DebounceSave(); ShowToast('"'+f.name+'" çöp kutusuna taşındı');
+}
+function ConvertFikirToProje(fid) {
+    const f=fikirler.find(fk=>fk.id===fid); if(!f) return;
+    if(!confirm('"'+f.name+'" fikrini projeye dönüştürmek istiyor musunuz?\nFikir silinecek, notlar yeni projenin "Genel" modülüne taşınacak.')) return;
+    pushUndo();
+    const modul={id:nextModulId++,name:'Genel',notes:[...f.notes]};
+    const proje={id:nextProjeId++,name:f.name,modules:[modul]};
+    projeler.push(proje);
+    fikirler.splice(fikirler.indexOf(f),1);
+    RenderSidebar(); SetActiveProje(proje.id); DebounceSave();
+    ShowToast('"'+f.name+'" projeye dönüştürüldü!',2000);
+}
+
+// ── PROJE OPS ──
+function AddNewProje() {
+    ShowModal('Yeni Proje','Proje adı...',(name)=>{
+        pushUndo();
+        const p={id:nextProjeId++,name,modules:[]};
+        projeler.push(p); RenderSidebar(); SetActiveProje(p.id); DebounceSave();
+        ShowToast('"'+name+'" projesi eklendi');
+    });
+}
+function SetActiveProje(pid) {
+    const p=projeler.find(pp=>pp.id===pid); if(!p) return;
+    aktifTip='proje'; aktifId=pid;
+    activeTitleSpan.innerText=p.name;
+    if(p.modules.length>0){ aktifModulId=p.modules.find(m=>m.id===aktifModulId)?aktifModulId:p.modules[0].id; } else aktifModulId=null;
+    selectedNoteIds.clear(); isConnectingMode=false; connectingFromCard=null;
+    if(isLineEditMode) DisableLineEditMode();
+    RenderSidebar(); RenderModuleTabs(); RenderBoard(); DebounceSave();
+}
+function DeleteProje(id) {
+    const idx=projeler.findIndex(p=>p.id===id); if(idx===-1) return;
+    pushUndo();
+    const p=projeler[idx];
+    p.modules.forEach(m=>{ m.notes.forEach(note=>trashBin.push({id:nextTrashId++,type:'not',name:note.title,parentName:p.name+' / '+m.name,deletedAt:new Date().toISOString(),originalData:note,parentId:p.id,parentType:'proje',modulId:m.id})); trashBin.push({id:nextTrashId++,type:'modul',name:m.name,parentName:p.name,deletedAt:new Date().toISOString(),originalData:{name:m.name,notes:m.notes},parentId:p.id,parentType:'proje'}); });
+    trashBin.push({id:nextTrashId++,type:'proje',name:p.name,parentName:'Genel',deletedAt:new Date().toISOString(),originalData:{name:p.name,modules:p.modules},parentId:null,parentType:null});
+    projeler.splice(idx,1);
+    if(aktifTip==='proje'&&aktifId===id){ if(projeler.length>0) SetActiveProje(projeler[0].id); else if(fikirler.length>0) SetActiveFikir(fikirler[0].id); else {aktifTip=null;aktifId=null;aktifModulId=null;activeTitleSpan.innerText='Ana Pano';moduleTabsContainer.innerHTML='';RenderBoard();} }
+    RenderSidebar(); DebounceSave(); ShowToast('"'+p.name+'" projesi çöp kutusuna taşındı');
+}
+
+// ── MODÜL OPS ──
+function AddNewModule() {
+    if(aktifTip!=='proje'){ShowToast("Modül eklemek için bir proje seçin",1200);return;}
+    const proje=projeler.find(p=>p.id===aktifId); if(!proje) return;
+    ShowModal('Yeni Modül','Modül adı (ör: algoritmalar, tasarım)...',(name)=>{
+        pushUndo();
+        const m={id:nextModulId++,name,notes:[]};
+        proje.modules.push(m); SetActiveModul(m.id); RenderModuleTabs(); RenderSidebar(); DebounceSave();
+        ShowToast('"'+name+'" modülü eklendi');
+    });
+}
+function SetActiveModul(mid) {
+    aktifModulId=mid; selectedNoteIds.clear(); isConnectingMode=false; connectingFromCard=null;
+    if(isLineEditMode) DisableLineEditMode();
+    RenderModuleTabs(); RenderBoard(); DebounceSave();
+}
+function DeleteModule(mid) {
+    const proje=projeler.find(p=>p.id===aktifId); if(!proje) return;
+    const idx=proje.modules.findIndex(m=>m.id===mid); if(idx===-1) return;
+    pushUndo();
+    const m=proje.modules[idx];
+    m.notes.forEach(note=>trashBin.push({id:nextTrashId++,type:'not',name:note.title,parentName:proje.name+' / '+m.name,deletedAt:new Date().toISOString(),originalData:note,parentId:proje.id,parentType:'proje',modulId:m.id}));
+    trashBin.push({id:nextTrashId++,type:'modul',name:m.name,parentName:proje.name,deletedAt:new Date().toISOString(),originalData:{name:m.name,notes:m.notes},parentId:proje.id,parentType:'proje'});
+    proje.modules.splice(idx,1);
+    if(aktifModulId===mid){ if(proje.modules.length>0) SetActiveModul(proje.modules[0].id); else {aktifModulId=null; RenderModuleTabs(); RenderBoard();} }
+    RenderModuleTabs(); RenderSidebar(); DebounceSave(); ShowToast('"'+m.name+'" modülü çöp kutusuna taşındı');
+}
+
+// ── NOTE OPS ──
+function GetCurrentNotes() {
+    if(aktifTip==='fikir'){ const f=fikirler.find(fk=>fk.id===aktifId); return f?f.notes:[]; }
+    if(aktifTip==='proje'){ const p=projeler.find(pp=>pp.id===aktifId); if(!p||!aktifModulId) return []; const m=p.modules.find(mm=>mm.id===aktifModulId); return m?m.notes:[]; }
+    return [];
+}
+function AddNoteToActive() {
+    if(!aktifTip||!aktifId){ShowToast("Önce bir fikir veya proje seçin",1200);return;}
+    if(aktifTip==='proje'&&!aktifModulId){ShowToast("Önce bir modül seçin",1200);return;}
+    pushUndo();
+    const {left,top}=GetRandomPosition();
+    const note={id:nextNoteId++,title:"Yeni Not",blocks:[MakeBlock('text')],left,top,bgColor:"#1e293b"};
+    const notes=GetCurrentNotes();
+    if(notes===null){ShowToast("Hata: hedef bulunamadı",1200);return;}
+    notes.push(note);
+    RenderBoard(); RenderSidebar(); DebounceSave(); ShowToast("Not eklendi",800);
+}
+function DeleteNote(noteId, skipUndo=false) {
+    if(!skipUndo) pushUndo();
+    const notes=GetCurrentNotes();
+    const idx=notes.findIndex(n=>n.id===noteId); if(idx===-1) return;
+    const removed=notes.splice(idx,1)[0];
+    let parentName='';
+    if(aktifTip==='fikir'){ const f=fikirler.find(fk=>fk.id===aktifId); parentName=f?f.name:''; trashBin.push({id:nextTrashId++,type:'not',name:removed.title,parentName,deletedAt:new Date().toISOString(),originalData:removed,parentId:aktifId,parentType:'fikir'}); }
+    else if(aktifTip==='proje'){ const p=projeler.find(pp=>pp.id===aktifId); const m=p?p.modules.find(mm=>mm.id===aktifModulId):null; parentName=p&&m?p.name+' / '+m.name:''; trashBin.push({id:nextTrashId++,type:'not',name:removed.title,parentName,deletedAt:new Date().toISOString(),originalData:removed,parentId:aktifId,parentType:'proje',modulId:aktifModulId}); }
+    RemoveConnectionsForNote(noteId);
+    RenderBoard(); RenderSidebar(); DebounceSave(); ShowToast("Not çöp kutusuna taşındı",800);
+}
+
+// ── RENDER SIDEBAR ──
+function RenderSidebar() {
+    fikirlerListDiv.innerHTML='';
+    if(fikirler.length===0){ fikirlerListDiv.innerHTML='<div class="empty-message">Henüz fikir yok</div>'; }
+    else fikirler.forEach(f=>{
+        const div=document.createElement('div'); div.className='list-item';
+        if(aktifTip==='fikir'&&aktifId===f.id) div.classList.add('active-item');
+        const nameSpan=document.createElement('span'); nameSpan.className='item-name';
+        nameSpan.innerHTML=`${EscapeHtml(f.name)}<span class="item-badge">${f.notes.length} not</span>`;
+        const actions=document.createElement('div'); actions.className='item-actions';
+        const convBtn=document.createElement('button'); convBtn.className='item-action-btn'; convBtn.title='Projeye dönüştür'; convBtn.innerHTML='→ Proje';
+        convBtn.addEventListener('click',(e)=>{ e.stopPropagation(); ConvertFikirToProje(f.id); });
+        const delBtn=document.createElement('button'); delBtn.className='item-action-btn danger'; delBtn.innerHTML='Sil';
+        delBtn.addEventListener('click',(e)=>{ e.stopPropagation(); DeleteFikir(f.id); });
+        actions.appendChild(convBtn); actions.appendChild(delBtn);
+        div.appendChild(nameSpan); div.appendChild(actions);
+        div.addEventListener('click',(e)=>{ if(!e.target.closest('.item-action-btn')) SetActiveFikir(f.id); });
+        fikirlerListDiv.appendChild(div);
+    });
+
+    projelerListDiv.innerHTML='';
+    if(projeler.length===0){ projelerListDiv.innerHTML='<div class="empty-message">Henüz proje yok</div>'; }
+    else projeler.forEach(p=>{
+        const div=document.createElement('div'); div.className='list-item';
+        if(aktifTip==='proje'&&aktifId===p.id) div.classList.add('active-item');
+        const toplamNot=p.modules.reduce((acc,m)=>acc+m.notes.length,0);
+        const nameSpan=document.createElement('span'); nameSpan.className='item-name';
+        nameSpan.innerHTML=`${EscapeHtml(p.name)}<span class="item-badge">${p.modules.length} modül · ${toplamNot} not</span>`;
+        const actions=document.createElement('div'); actions.className='item-actions';
+        const delBtn=document.createElement('button'); delBtn.className='item-action-btn danger'; delBtn.innerHTML='Sil';
+        delBtn.addEventListener('click',(e)=>{ e.stopPropagation(); DeleteProje(p.id); });
+        actions.appendChild(delBtn);
+        div.appendChild(nameSpan); div.appendChild(actions);
+        div.addEventListener('click',(e)=>{ if(!e.target.closest('.item-action-btn')) SetActiveProje(p.id); });
+        projelerListDiv.appendChild(div);
+    });
+}
+
+// ── RENDER MODULE TABS ──
+function RenderModuleTabs() {
+    moduleTabsContainer.innerHTML='';
+    if(aktifTip!=='proje') return;
+    const proje=projeler.find(p=>p.id===aktifId); if(!proje) return;
+    proje.modules.forEach(m=>{
+        const btn=document.createElement('button'); btn.className='module-tab';
+        if(aktifModulId===m.id) btn.classList.add('active-tab');
+        btn.innerHTML=`${EscapeHtml(m.name)}<button class="delete-module-btn" data-id="${m.id}">✕</button>`;
+        btn.onclick=(e)=>{ if(!e.target.classList.contains('delete-module-btn')) SetActiveModul(m.id); };
+        btn.querySelector('.delete-module-btn').addEventListener('click',(e)=>{ e.stopPropagation(); DeleteModule(m.id); });
+        moduleTabsContainer.appendChild(btn);
+    });
+    const addBtn=document.createElement('button'); addBtn.className='add-module-btn'; addBtn.innerHTML='+ Modül ekle';
+    addBtn.onclick=()=>AddNewModule();
+    moduleTabsContainer.appendChild(addBtn);
+}
+
+// ── RENDER BOARD ──
+function RenderBoard() {
+    notesContainer.innerHTML='';
+    if(!aktifTip||!aktifId){ notesContainer.innerHTML='<div style="color:#5a6e85;text-align:center;margin-top:80px;font-size:0.9rem;">Bir fikir veya proje seçin</div>'; return; }
+    let notes=[];
+    if(aktifTip==='fikir'){
+        const f=fikirler.find(fk=>fk.id===aktifId);
+        if(!f){notesContainer.innerHTML='<div style="color:#5a6e85;text-align:center;margin-top:80px;">Fikir bulunamadı</div>';return;}
+        notes=f.notes;
+    } else {
+        const p=projeler.find(pp=>pp.id===aktifId);
+        if(!p){notesContainer.innerHTML='<div style="color:#5a6e85;text-align:center;margin-top:80px;">Proje bulunamadı</div>';return;}
+        if(!aktifModulId||!p.modules.find(m=>m.id===aktifModulId)){
+            if(p.modules.length>0){aktifModulId=p.modules[0].id;RenderModuleTabs();}
+            else{notesContainer.innerHTML='<div style="color:#5a6e85;text-align:center;margin-top:80px;">Modül eklemek için "+ Modül ekle"ye tıklayın</div>';return;}
+        }
+        const m=p.modules.find(mm=>mm.id===aktifModulId);
+        notes=m.notes;
+    }
+    if(notes.length===0){ notesContainer.innerHTML='<div style="color:#5a6e85;text-align:center;margin-top:80px;font-size:0.85rem;">Not eklemek için "+ Not Ekle"ye tıklayın</div>'; return; }
+    notes.forEach(note=>RenderNoteCard(note));
+    setTimeout(()=>RenderLines(),50);
+}
+
+// ── TRASH ──
+function ShowTrashModal() {
+    const modal=document.createElement('div'); modal.className='modal-overlay';
+    if(trashBin.length===0){
+        modal.innerHTML=`<div class="modal-container"><h3>🗑 Çöp Kutusu</h3><div class="empty-trash">Çöp kutusu boş</div><div class="modal-buttons"><button class="modal-btn modal-btn-cancel" id="CM">Kapat</button></div></div>`;
+        document.body.appendChild(modal); modal.querySelector('#CM').onclick=()=>modal.remove(); return;
+    }
+    modal.innerHTML=`<div class="modal-container" style="width:580px;"><h3>🗑 Çöp Kutusu</h3><div class="trash-list" id="TL"></div><div class="modal-buttons" style="justify-content:space-between;"><div style="display:flex;gap:6px;"><button class="modal-btn modal-btn-cancel" id="SABtn">Tümünü Seç</button></div><div style="display:flex;gap:7px;"><button class="modal-btn modal-btn-confirm" id="RBtn">Geri Yükle</button><button class="modal-btn modal-btn-danger" id="DBtn">Kalıcı Sil</button><button class="modal-btn modal-btn-cancel" id="CBtn">Kapat</button></div></div></div>`;
+    document.body.appendChild(modal);
+    const listDiv=modal.querySelector('#TL');
+    let selected=new Array(trashBin.length).fill(false);
+    const typeBadge=(type)=>{ const map={'fikir':['tb-fikir','💡 Fikir'],'proje':['tb-proje','📁 Proje'],'modul':['tb-modul','📂 Modül'],'not':['tb-not','📝 Not']}; const [cls,lbl]=map[type]||['tb-not',type]; return `<span class="trash-type-badge ${cls}">${lbl}</span>`; };
+    const renderList=()=>{
+        listDiv.innerHTML='';
+        trashBin.forEach((item,idx)=>{
+            const div=document.createElement('div'); div.className='trash-item'; if(selected[idx]) div.classList.add('selected');
+            div.innerHTML=`<input type="checkbox" class="trash-checkbox" ${selected[idx]?'checked':''}><div class="trash-info"><div class="trash-name">${EscapeHtml(item.name)}</div><div class="trash-meta">${typeBadge(item.type)}<span>${EscapeHtml(item.parentName)}</span><span>${new Date(item.deletedAt).toLocaleDateString('tr-TR')}</span></div></div>`;
+            const chk=div.querySelector('.trash-checkbox');
+            chk.onchange=(e)=>{selected[idx]=e.target.checked; div.classList.toggle('selected',e.target.checked);};
+            div.onclick=(e)=>{if(e.target!==chk){chk.checked=!chk.checked;selected[idx]=chk.checked;div.classList.toggle('selected',chk.checked);}};
+            listDiv.appendChild(div);
+        });
+    };
+    renderList();
+    modal.querySelector('#SABtn').onclick=()=>{selected.fill(true);renderList();};
+    modal.querySelector('#RBtn').onclick=()=>{
+        const idxs=selected.map((v,i)=>v?i:-1).filter(i=>i!==-1);
+        if(idxs.length===0){ShowToast("Lütfen öğe seçin",1000);return;}
+        RestoreFromTrash(idxs); modal.remove(); ShowToast(idxs.length+" öğe geri yüklendi",1500);
+    };
+    modal.querySelector('#DBtn').onclick=()=>{
+        const idxs=selected.map((v,i)=>v?i:-1).filter(i=>i!==-1).reverse();
+        if(idxs.length===0){ShowToast("Lütfen öğe seçin",1000);return;}
+        if(confirm(idxs.length+" öğeyi kalıcı olarak silmek istiyor musunuz?")){ idxs.forEach(i=>trashBin.splice(i,1)); DebounceSave(); modal.remove(); ShowToast(idxs.length+" öğe kalıcı silindi",1500); }
+    };
+    modal.querySelector('#CBtn').onclick=()=>modal.remove();
+}
+
+function RestoreFromTrash(indices) {
+    for(let i of indices.sort((a,b)=>b-a)){
+        const item=trashBin[i];
+        if(item.type==='fikir'){ const f={id:nextFikirId++,name:item.name,notes:item.originalData?.notes||[]}; f.notes.forEach(n=>{if(n.id>=nextNoteId)nextNoteId=n.id+1;}); fikirler.push(f); }
+        else if(item.type==='proje'){ const p={id:nextProjeId++,name:item.name,modules:item.originalData?.modules||[]}; p.modules.forEach(m=>{if(m.id>=nextModulId)nextModulId=m.id+1; m.notes.forEach(n=>{if(n.id>=nextNoteId)nextNoteId=n.id+1;})}); projeler.push(p); }
+        else if(item.type==='modul'){ const p=projeler.find(pp=>pp.id===item.parentId); if(p){ const m={id:nextModulId++,name:item.name,notes:item.originalData?.notes||[]}; m.notes.forEach(n=>{if(n.id>=nextNoteId)nextNoteId=n.id+1;}); p.modules.push(m); } }
+        else if(item.type==='not'){
+            if(item.parentType==='fikir'){ const f=fikirler.find(ff=>ff.id===item.parentId); if(f&&item.originalData){ f.notes.push({...item.originalData,id:nextNoteId++}); } }
+            else if(item.parentType==='proje'&&item.modulId){ const p=projeler.find(pp=>pp.id===item.parentId); if(p){ const m=p.modules.find(mm=>mm.id===item.modulId); if(m&&item.originalData) m.notes.push({...item.originalData,id:nextNoteId++}); } }
+        }
+        trashBin.splice(i,1);
+    }
+    RenderSidebar(); RenderModuleTabs(); RenderBoard(); DebounceSave();
+}
+
+// ── EVENTS ──
+document.getElementById('AddFikirBtn').addEventListener('click', AddNewFikir);
+document.getElementById('AddProjeBtn').addEventListener('click', AddNewProje);
+document.getElementById('AddNoteToActiveBtn').addEventListener('click', AddNoteToActive);
+document.getElementById('TrashBinBtn').addEventListener('click', ShowTrashModal);
+document.getElementById('EnableLineEditBtn').addEventListener('click', EnableLineEditMode);
+document.getElementById('UndoBtn').addEventListener('click', performUndo);
+document.getElementById('SaveManualBtn').addEventListener('click', ()=>{ SaveToDB(); ShowToast("Kaydedildi ✓",1000); });
+
+window.addEventListener('resize', ()=>{ RenderBoard(); setTimeout(()=>RenderLines(),100); });
+
+// ── START ──
+async function StartApp() {
+    await InitDB();
+    await LoadFromDB();
+    RenderSidebar();
+    RenderModuleTabs();
+    RenderLineEditorBar();
+    initSelection();
+    if(aktifTip==='fikir'&&fikirler.find(f=>f.id===aktifId)) SetActiveFikir(aktifId);
+    else if(aktifTip==='proje'&&projeler.find(p=>p.id===aktifId)) SetActiveProje(aktifId);
+    else if(fikirler.length>0) SetActiveFikir(fikirler[0].id);
+    else if(projeler.length>0) SetActiveProje(projeler[0].id);
+    else RenderBoard();
+}
+StartApp();
 </script>
 </body>
 </html>
-
-<!-- tümünü seçmeye çalıştığımda çizgileri de seçsin ayrı olduğunda, sadece kart değil her şey için seçsin yani -->
-<!-- çöp kutusunda fikir proje modül ayrımı yapılsın neyin ne olduğunu göremiyorum -->
-<!-- ctrl z ile işlemler geri alınabilsin -->
-<!-- düzenlemeleri kaydet seçeneği gelsin -->
