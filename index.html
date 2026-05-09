@@ -197,7 +197,8 @@ body {
 .card-body { padding:8px; display:flex; flex-direction:column; gap:5px; min-height:40px; }
 
 /* Blocks inside card */
-.block { position:relative; border-radius:8px; overflow:hidden; }
+/* FIX: block-delete-btn is now sticky to top of its block, always visible */
+.block { position:relative; border-radius:8px; overflow:visible; }
 
 .block-text textarea {
     width:100%; background:#0f131c; border:none; color:#cbd5e6;
@@ -286,6 +287,25 @@ body {
 }
 .link-label-inp:focus { outline:none; border-bottom-color:#3b82f6; }
 
+/* FIX: block-delete-btn is sticky at the top-right, always visible regardless of scroll */
+.block-delete-btn {
+    position:sticky;
+    top:4px;
+    float:right;
+    margin: 0 0 -20px 4px;
+    background:#1a1f2a;
+    border:none;
+    color:#5a6e85;
+    cursor:pointer;
+    font-size:10px;
+    border-radius:4px;
+    padding:2px 5px;
+    z-index:5;
+    opacity:0.85;
+    line-height:1.4;
+}
+.block-delete-btn:hover { color:#f87171; background:#2a1a22; opacity:1; }
+
 /* Block add toolbar */
 .card-addblock-bar {
     display:flex; gap:5px; padding:6px 8px 4px;
@@ -297,15 +317,6 @@ body {
     transition:all 0.15s;
 }
 .addblock-btn:hover { background:#1e3a5f; color:#7ab7ef; }
-
-/* Block delete */
-.block-delete-btn {
-    position:absolute; top:4px; right:4px;
-    background:none; border:none; color:transparent; cursor:pointer;
-    font-size:10px; border-radius:4px; padding:1px 4px; z-index:5;
-}
-.block:hover .block-delete-btn { color:#5a6e85; }
-.block-delete-btn:hover { color:#f87171 !important; background:#2a1a22; }
 
 /* Card footer */
 .card-footer { padding:5px 8px 8px; display:flex; justify-content:space-between; align-items:center; }
@@ -462,11 +473,11 @@ svg line { pointer-events:stroke; }
                 <div class="active-info">
                     <h3 id="ActiveTitle">Ana Pano</h3>
                 </div>
+                <!-- FIX: Manuel kaydet butonu kaldırıldı, otomatik kayıt yeterli -->
                 <div class="board-actions" id="BoardActions">
                     <button class="action-btn primary" id="AddNoteToActiveBtn">+ Not Ekle</button>
                     <button class="action-btn" id="EnableLineEditBtn">Çizgileri Düzenle</button>
                     <button class="action-btn" id="UndoBtn" title="Ctrl+Z">↩ Geri Al</button>
-                    <button class="action-btn warn" id="SaveManualBtn">💾 Kaydet</button>
                 </div>
             </div>
             <div id="LineEditorContainer"></div>
@@ -662,12 +673,13 @@ function EnsureBlocks(note) {
     if (note.blocks.length === 0) note.blocks.push(MakeBlock('text'));
 }
 
-// ── RENDER BLOCK (inline in card) ──
+// ── RENDER BLOCK ──
 function RenderBlockElement(block, note, isExpand) {
     const wrapper = document.createElement('div');
     wrapper.className = 'block';
     wrapper.setAttribute('data-block-id', block.id);
 
+    // FIX: delete button rendered FIRST so float:right places it top-right
     const delBtn = document.createElement('button');
     delBtn.className = 'block-delete-btn';
     delBtn.title = 'Bloğu sil';
@@ -678,9 +690,10 @@ function RenderBlockElement(block, note, isExpand) {
         note.blocks = note.blocks.filter(b=>b.id!==block.id);
         if(note.blocks.length===0) note.blocks.push(MakeBlock('text'));
         DebounceSave();
-        if(isExpand) return; // expand modal re-renders itself
+        if(isExpand) return;
         RenderBoard();
     });
+    wrapper.appendChild(delBtn);
 
     if (block.type==='text') {
         wrapper.classList.add('block-text');
@@ -695,7 +708,8 @@ function RenderBlockElement(block, note, isExpand) {
     else if (block.type==='checklist') {
         wrapper.classList.add('block-checklist');
         const renderItems = () => {
-            wrapper.innerHTML='';
+            // Remove all children except delBtn
+            Array.from(wrapper.children).forEach(c=>{ if(c!==delBtn) c.remove(); });
             block.items.forEach((item,idx)=>{
                 const row=document.createElement('div'); row.className='checklist-item';
                 const cb=document.createElement('input'); cb.type='checkbox'; cb.className='checklist-cb'; cb.checked=item.done;
@@ -725,7 +739,7 @@ function RenderBlockElement(block, note, isExpand) {
     else if (block.type==='steps') {
         wrapper.classList.add('block-steps');
         const renderSteps = () => {
-            wrapper.innerHTML='';
+            Array.from(wrapper.children).forEach(c=>{ if(c!==delBtn) c.remove(); });
             block.items.forEach((item,idx)=>{
                 const row=document.createElement('div'); row.className='step-item';
                 const num=document.createElement('div'); num.className='step-num'; num.innerText=idx+1;
@@ -787,7 +801,6 @@ function RenderBlockElement(block, note, isExpand) {
         }
     }
 
-    wrapper.appendChild(delBtn);
     return wrapper;
 }
 
@@ -806,7 +819,6 @@ function MakeAddBlockBar(note, isExpand, container) {
             note.blocks.push(block);
             DebounceSave();
             if(isExpand) {
-                // re-render blocks in expand modal
                 RenderExpandBlocks(note, container);
             } else {
                 RenderBoard();
@@ -876,7 +888,7 @@ function RenderNoteCard(note) {
     titlebar.appendChild(titleInp); titlebar.appendChild(connBtn); titlebar.appendChild(delBtn);
     card.appendChild(titlebar);
 
-    // Body (first block only for compact view, or first 2)
+    // Body
     const body=document.createElement('div'); body.className='card-body';
     const displayBlocks=note.blocks.slice(0,2);
     displayBlocks.forEach(block=>body.appendChild(RenderBlockElement(block, note, false)));
@@ -887,7 +899,6 @@ function RenderNoteCard(note) {
     }
     card.appendChild(body);
 
-    // Add block bar (compact)
     card.appendChild(MakeAddBlockBar(note, false, null));
 
     // Footer
@@ -1012,7 +1023,7 @@ function RenderLines() {
         const x2=tr.left+tr.width/2-cr.left, y2=tr.top+tr.height/2-cr.top;
         const color=lineColors[conn.id]||'#60a5fa';
         const width=lineWidths[conn.id]||3;
-        const isSel=isLineEditMode&&selectedLineIds.has(conn.id);
+        const isSel=selectedLineIds.has(conn.id);
         const line=document.createElementNS('http://www.w3.org/2000/svg','line');
         line.setAttribute('x1',x1); line.setAttribute('y1',y1);
         line.setAttribute('x2',x2); line.setAttribute('y2',y2);
@@ -1097,7 +1108,8 @@ function RenderLineEditorBar() {
     document.getElementById('CloseLineEd').onclick=()=>DisableLineEditMode();
 }
 
-// ── MOUSE SELECTION (cards + lines) ──
+// ── MOUSE SELECTION ──
+// FIX: Çizgiler her zaman seçime dahil (line edit modu açık olmasa bile)
 function initSelection() {
     selectionRect=document.getElementById('SelectionRect');
     whiteboardCanvas.addEventListener('mousedown',(e)=>{
@@ -1129,7 +1141,7 @@ function initSelection() {
         const l=Math.min(selectionStart.x,ex), t=Math.min(selectionStart.y,ey);
         const ri=Math.max(selectionStart.x,ex), b=Math.max(selectionStart.y,ey);
         if(ri-l>5&&b-t>5) {
-            // Select cards
+            // Kart seçimi
             document.querySelectorAll('.idea-card').forEach(card=>{
                 const cr=card.getBoundingClientRect();
                 const cl=cr.left-r.left, ct=cr.top-r.top, crr=cr.right-r.left, cb=cr.bottom-r.top;
@@ -1138,20 +1150,28 @@ function initSelection() {
                     selectedNoteIds.add(nid); card.classList.add('selected-card');
                 }
             });
-            // Select lines (check midpoint)
-            if(isLineEditMode) {
-                connections.forEach(conn=>{
-                    const fc=document.querySelector(`.idea-card[data-note-id='${conn.from}']`);
-                    const tc=document.querySelector(`.idea-card[data-note-id='${conn.to}']`);
-                    if(!fc||!tc) return;
-                    const fr=fc.getBoundingClientRect(), tr=tc.getBoundingClientRect();
-                    const mx=(fr.left+fr.width/2+tr.left+tr.width/2)/2-r.left;
-                    const my=(fr.top+fr.height/2+tr.top+tr.height/2)/2-r.top;
-                    if(mx>l&&mx<ri&&my>t&&my<b) selectedLineIds.add(conn.id);
-                });
-                RenderLineEditorBar(); RenderLines();
+            // FIX: Çizgi seçimi — her zaman aktif, line edit moduna bağlı değil
+            connections.forEach(conn=>{
+                const fc=document.querySelector(`.idea-card[data-note-id='${conn.from}']`);
+                const tc=document.querySelector(`.idea-card[data-note-id='${conn.to}']`);
+                if(!fc||!tc) return;
+                const fr=fc.getBoundingClientRect(), tr=tc.getBoundingClientRect();
+                // Çizginin birden fazla noktasını kontrol et (daha iyi seçim)
+                for(let i=0; i<=10; i++){
+                    const mx=(fr.left+fr.width/2)*(1-i/10)+(tr.left+tr.width/2)*(i/10)-r.left;
+                    const my=(fr.top+fr.height/2)*(1-i/10)+(tr.top+tr.height/2)*(i/10)-r.top;
+                    if(mx>l&&mx<ri&&my>t&&my<b){ selectedLineIds.add(conn.id); break; }
+                }
+            });
+            if(selectedLineIds.size>0){
+                RenderLines();
+                // Line edit modunu otomatik aç (çizgiler seçildiyse)
+                if(!isLineEditMode && selectedLineIds.size>0){
+                    isLineEditMode=true; RenderLineEditorBar();
+                }
+                RenderLineEditorBar();
             }
-            const total=selectedNoteIds.size+(isLineEditMode?selectedLineIds.size:0);
+            const total=selectedNoteIds.size+selectedLineIds.size;
             if(total>0) ShowToast(total+" öğe seçildi. Delete ile sil.",2000);
         }
         selectionRect.style.display='none';
@@ -1159,7 +1179,7 @@ function initSelection() {
     window.addEventListener('keydown',(e)=>{
         if(e.ctrlKey&&e.key==='z') { e.preventDefault(); performUndo(); return; }
         if(e.key==='Delete') {
-            if(isLineEditMode&&selectedLineIds.size>0){ DeleteSelectedLines(); return; }
+            if(selectedLineIds.size>0){ DeleteSelectedLines(); return; }
             if(selectedNoteIds.size>0){
                 if(confirm(selectedNoteIds.size+" notu silmek istiyor musunuz?")){
                     pushUndo();
@@ -1172,7 +1192,8 @@ function initSelection() {
             selectedNoteIds.clear(); selectedLineIds.clear();
             document.querySelectorAll('.idea-card').forEach(c=>c.classList.remove('selected-card'));
             if(isConnectingMode){ isConnectingMode=false; connectingFromCard=null; document.querySelectorAll('.connector-btn').forEach(b=>b.classList.remove('active-connector')); }
-            if(isLineEditMode){ RenderLineEditorBar(); RenderLines(); }
+            if(isLineEditMode){ DisableLineEditMode(); }
+            RenderLines();
         }
     });
 }
@@ -1285,7 +1306,7 @@ function AddNoteToActive() {
     if(aktifTip==='proje'&&!aktifModulId){ShowToast("Önce bir modül seçin",1200);return;}
     pushUndo();
     const {left,top}=GetRandomPosition();
-    const note={id:nextNoteId++,title:"Yeni Not",blocks:[MakeBlock('text')],left,top,bgColor:"#1e293b"};
+    const note={id:nextNoteId++,blocks:[MakeBlock('text')],left,top,bgColor:"#1e293b"};
     const notes=GetCurrentNotes();
     if(notes===null){ShowToast("Hata: hedef bulunamadı",1200);return;}
     notes.push(note);
@@ -1443,7 +1464,6 @@ document.getElementById('AddNoteToActiveBtn').addEventListener('click', AddNoteT
 document.getElementById('TrashBinBtn').addEventListener('click', ShowTrashModal);
 document.getElementById('EnableLineEditBtn').addEventListener('click', EnableLineEditMode);
 document.getElementById('UndoBtn').addEventListener('click', performUndo);
-document.getElementById('SaveManualBtn').addEventListener('click', ()=>{ SaveToDB(); ShowToast("Kaydedildi ✓",1000); });
 
 window.addEventListener('resize', ()=>{ RenderBoard(); setTimeout(()=>RenderLines(),100); });
 
