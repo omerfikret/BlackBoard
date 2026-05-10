@@ -394,6 +394,32 @@ svg line { pointer-events:stroke; }
 .modal-btn-danger { background:#b91c1c; color:#fff; }
 .modal-btn-warn { background:#d97706; color:#fff; }
 
+/* ─── SEARCH ─── */
+.search-box { padding:10px 12px; border-bottom:1px solid #1e2a3a; }
+.search-input {
+    width:100%; background:#0a0c12; border:1px solid #1e2a3a; border-radius:9px;
+    color:#e2e8f0; font-size:0.78rem; font-family:inherit; padding:7px 10px;
+    outline:none; transition:border-color 0.15s; user-select:text;
+}
+.search-input:focus { border-color:#3b82f6; }
+.search-results {
+    margin-top:6px; display:flex; flex-direction:column; gap:4px;
+    max-height:200px; overflow-y:auto;
+}
+.search-result-item {
+    background:#11161f; border:1px solid #1e2a3a; border-radius:8px;
+    padding:7px 10px; cursor:pointer; transition:all 0.15s;
+    display:flex; align-items:center; gap:8px;
+}
+.search-result-item:hover { background:#16212b; border-color:#2c4c6e; }
+.search-result-badge {
+    font-size:0.58rem; padding:2px 6px; border-radius:10px; flex-shrink:0;
+}
+.srb-fikir { background:#1e3a5f; color:#7ab7ef; }
+.srb-proje { background:#2a1a4a; color:#c084fc; }
+.search-result-name { color:#e2e8f0; font-size:0.78rem; font-weight:500; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.search-no-result { color:#5a6e85; font-size:0.72rem; text-align:center; padding:8px 0; }
+
 /* Trash modal */
 .trash-list { max-height:340px; overflow-y:auto; margin:14px 0; display:flex; flex-direction:column; gap:5px; }
 .trash-item {
@@ -450,6 +476,10 @@ svg line { pointer-events:stroke; }
         <div class="create-buttons">
             <button class="create-btn" id="AddFikirBtn">+ Fikir Ekle</button>
             <button class="create-btn" id="AddProjeBtn">+ Proje Ekle</button>
+        </div>
+        <div class="search-box">
+            <input type="text" class="search-input" id="SearchInput" placeholder="🔍 Fikir veya proje ara...">
+            <div class="search-results" id="SearchResults"></div>
         </div>
         <div class="lists-container">
             <div class="list-section">
@@ -771,7 +801,6 @@ function RenderBlockElement(block, note, isExpand) {
         sel.addEventListener('change',()=>{ block.lang=sel.value; DebounceSave(); });
         sel.addEventListener('mousedown',e=>e.stopPropagation());
         const copyBtn=document.createElement('button'); copyBtn.className='code-copy-btn'; copyBtn.innerText='Kopyala';
-        copyBtn.addEventListener('click',()=>{ navigator.clipboard.writeText(ta.value).then(()=>ShowToast("Kod kopyalandı",900)); });
         copyBtn.addEventListener('mousedown',e=>e.stopPropagation());
         bar.appendChild(sel); bar.appendChild(copyBtn);
         const ta=document.createElement('textarea');
@@ -779,6 +808,7 @@ function RenderBlockElement(block, note, isExpand) {
         ta.addEventListener('input',()=>{ block.content=ta.value; DebounceSave(); });
         ta.addEventListener('mousedown',e=>e.stopPropagation());
         ta.addEventListener('keydown',(e)=>{ if(e.key==='Tab'){ e.preventDefault(); const s=ta.selectionStart,en=ta.selectionEnd; ta.value=ta.value.substring(0,s)+'    '+ta.value.substring(en); ta.selectionStart=ta.selectionEnd=s+4; } });
+        copyBtn.addEventListener('click',()=>{ navigator.clipboard.writeText(ta.value).then(()=>ShowToast("Kod kopyalandı",900)).catch(()=>{ const tmp=document.createElement('textarea'); tmp.value=ta.value; document.body.appendChild(tmp); tmp.select(); document.execCommand('copy'); tmp.remove(); ShowToast("Kod kopyalandı",900); }); });
         wrapper.appendChild(bar); wrapper.appendChild(ta);
     }
     else if (block.type==='link') {
@@ -1306,7 +1336,7 @@ function AddNoteToActive() {
     if(aktifTip==='proje'&&!aktifModulId){ShowToast("Önce bir modül seçin",1200);return;}
     pushUndo();
     const {left,top}=GetRandomPosition();
-    const note={id:nextNoteId++,blocks:[MakeBlock('text')],left,top,bgColor:"#1e293b"};
+    const note={id:nextNoteId++,title:"Yeni Not",blocks:[MakeBlock('text')],left,top,bgColor:"#1e293b"};
     const notes=GetCurrentNotes();
     if(notes===null){ShowToast("Hata: hedef bulunamadı",1200);return;}
     notes.push(note);
@@ -1467,6 +1497,39 @@ document.getElementById('UndoBtn').addEventListener('click', performUndo);
 
 window.addEventListener('resize', ()=>{ RenderBoard(); setTimeout(()=>RenderLines(),100); });
 
+// ── SEARCH ──
+function InitSearch() {
+    const inp = document.getElementById('SearchInput');
+    const resultsDiv = document.getElementById('SearchResults');
+    inp.addEventListener('mousedown', e => e.stopPropagation());
+    inp.addEventListener('input', () => {
+        const q = inp.value.trim().toLowerCase();
+        resultsDiv.innerHTML = '';
+        if (!q) return;
+        const hits = [];
+        fikirler.forEach(f => { if (f.name.toLowerCase().includes(q)) hits.push({type:'fikir', item:f}); });
+        projeler.forEach(p => { if (p.name.toLowerCase().includes(q)) hits.push({type:'proje', item:p}); });
+        if (hits.length === 0) {
+            resultsDiv.innerHTML = '<div class="search-no-result">Sonuç bulunamadı</div>';
+            return;
+        }
+        hits.forEach(({type, item}) => {
+            const div = document.createElement('div'); div.className = 'search-result-item';
+            const badge = document.createElement('span');
+            badge.className = 'search-result-badge ' + (type==='fikir' ? 'srb-fikir' : 'srb-proje');
+            badge.innerText = type==='fikir' ? 'Fikir' : 'Proje';
+            const name = document.createElement('span'); name.className = 'search-result-name'; name.innerText = item.name;
+            div.appendChild(badge); div.appendChild(name);
+            div.addEventListener('click', () => {
+                if (type==='fikir') SetActiveFikir(item.id);
+                else SetActiveProje(item.id);
+                inp.value = ''; resultsDiv.innerHTML = '';
+            });
+            resultsDiv.appendChild(div);
+        });
+    });
+}
+
 // ── START ──
 async function StartApp() {
     await InitDB();
@@ -1474,6 +1537,7 @@ async function StartApp() {
     RenderSidebar();
     RenderModuleTabs();
     RenderLineEditorBar();
+    InitSearch();
     initSelection();
     if(aktifTip==='fikir'&&fikirler.find(f=>f.id===aktifId)) SetActiveFikir(aktifId);
     else if(aktifTip==='proje'&&projeler.find(p=>p.id===aktifId)) SetActiveProje(aktifId);
