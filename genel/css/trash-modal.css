@@ -1,0 +1,21 @@
+/* Trash modal */
+.trash-list { max-height:340px; overflow-y:auto; margin:14px 0; display:flex; flex-direction:column; gap:5px; }
+.trash-item {
+    background:#0a0c12; padding:9px 10px; border-radius:8px;
+    display:flex; align-items:center; gap:9px; cursor:pointer;
+    border:1px solid #1e2a3a; transition:0.15s;
+}
+.trash-item:hover { border-color:#2c4c6e; }
+.trash-item.selected { background:#0f2b3f; border-color:#3b82f6; }
+.trash-checkbox { width:14px; height:14px; accent-color:#3b82f6; cursor:pointer; flex-shrink:0; }
+.trash-info { flex:1; }
+.trash-name { font-weight:500; font-size:0.78rem; color:#e2e8f0; }
+.trash-meta { font-size:0.62rem; color:#7a8aa5; margin-top:2px; display:flex; align-items:center; gap:5px; }
+.trash-type-badge {
+    padding:1px 6px; border-radius:10px; font-size:0.6rem; font-weight:600;
+}
+.tb-fikir { background:#1e3a5f; color:#7ab7ef; }
+.tb-proje { background:#2a1a4a; color:#c084fc; }
+.tb-modul { background:#0f3a2a; color:#34d399; }
+.tb-not { background:#1e2a3a; color:#94a3b8; }
+.empty-trash { text-align:center; padding:36px; color:#5a6e85; }

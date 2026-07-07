@@ -1,0 +1,16 @@
+/* Line Editor */
+.line-editor-bar {
+    background:#0f2b3f; border-radius:10px; padding:7px 14px;
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-top:8px;
+}
+.line-editor-label { color:#7ab7ef; font-size:0.72rem; font-weight:600; }
+.color-picker-group { display:flex; gap:6px; align-items:center; }
+.line-color-option { width:22px; height:22px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:0.1s; }
+.line-color-option:hover { transform:scale(1.15); border-color:#fff; }
+.stroke-btn { background:#1e2a3a; border:none; padding:3px 10px; border-radius:20px; color:#fff; font-size:0.68rem; cursor:pointer; font-family:inherit; }
+.stroke-btn:hover { background:#3b82f6; }
+.line-action-btn { background:#2a1a22; border:none; padding:3px 10px; border-radius:20px; color:#f08b8b; font-size:0.68rem; cursor:pointer; font-family:inherit; }
+.line-action-btn:hover { background:#b91c1c; color:#fff; }
+.close-editor-btn { background:#1e2a3a; border:none; padding:3px 10px; border-radius:20px; color:#a0b3d0; font-size:0.68rem; cursor:pointer; font-family:inherit; margin-left:auto; }
+.close-editor-btn:hover { background:#3b82f6; color:#fff; }
+.selection-info { color:#60a5fa; font-size:0.68rem; background:#1e3a5f; padding:3px 9px; border-radius:20px; }

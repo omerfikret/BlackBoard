@@ -1,0 +1,22 @@
+/* ─── MAIN BOARD ─── */
+.main-board { flex:1; background:#0a0a0f; display:flex; flex-direction:column; overflow:hidden; }
+
+.board-header {
+    padding:13px 22px;
+    background:rgba(10,10,15,0.97);
+    border-bottom:1px solid #1f2c38;
+    flex-shrink:0;
+}
+.header-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.active-info h3 { color:#f1f5f9; font-size:1rem; font-weight:500; }
+
+.board-actions { display:flex; gap:7px; flex-wrap:wrap; align-items:center; }
+.action-btn {
+    background:#11161f; border:none; padding:7px 16px; border-radius:30px;
+    color:#e2e8f0; font-weight:500; cursor:pointer; font-size:0.78rem;
+    font-family:inherit; transition:all 0.2s; border:1px solid #1e2a3a;
+}
+.action-btn:hover { background:#1e3a5f; border-color:#3b82f6; }
+.action-btn.primary { background:#1e3a5f; border-color:#3b82f6; color:#7ab7ef; }
+.action-btn.danger { background:#2a1a1a; border-color:#7f1d1d; color:#f87171; }
+.action-btn.warn { background:#2a2010; border-color:#78350f; color:#fbbf24; }

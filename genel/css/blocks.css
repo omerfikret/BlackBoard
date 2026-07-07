@@ -1,0 +1,112 @@
+/* Card body: blocks */
+.card-body { padding:8px; display:flex; flex-direction:column; gap:5px; min-height:40px; }
+
+/* Blocks inside card */
+/* FIX: block-delete-btn is now sticky to top of its block, always visible */
+.block { position:relative; border-radius:8px; overflow:visible; }
+
+.block-text textarea {
+    width:100%; background:#0f131c; border:none; color:#cbd5e6;
+    font-size:0.74rem; font-family:inherit; resize:vertical;
+    padding:7px 8px; border-radius:8px; min-height:50px;
+    line-height:1.5;
+}
+.block-text textarea:focus { outline:none; background:#1a2230; }
+
+.block-checklist { background:#0d1520; border-radius:8px; padding:6px 8px; }
+.checklist-item {
+    display:flex; align-items:flex-start; gap:7px; padding:3px 0;
+    border-bottom:1px solid #1e2a3a30;
+}
+.checklist-item:last-child { border-bottom:none; }
+.checklist-cb { width:14px; height:14px; accent-color:#3b82f6; cursor:pointer; margin-top:1px; flex-shrink:0; }
+.checklist-label {
+    flex:1; font-size:0.73rem; color:#cbd5e6; background:transparent;
+    border:none; font-family:inherit; padding:0;
+}
+.checklist-label:focus { outline:none; }
+.checklist-label.done { text-decoration:line-through; color:#5a6e85; }
+.checklist-del { background:none; border:none; color:#5a6e85; cursor:pointer; font-size:10px; padding:0 3px; }
+.checklist-del:hover { color:#f87171; }
+.add-checklist-item {
+    width:100%; background:none; border:none; color:#5a6e85; font-size:0.68rem;
+    cursor:pointer; text-align:left; padding:4px 2px; font-family:inherit;
+    margin-top:2px;
+}
+.add-checklist-item:hover { color:#7ab7ef; }
+
+.block-steps { background:#0d1520; border-radius:8px; padding:6px 8px; }
+.step-item {
+    display:flex; align-items:flex-start; gap:8px; padding:4px 0;
+    border-bottom:1px solid #1e2a3a30;
+}
+.step-item:last-child { border-bottom:none; }
+.step-num {
+    width:18px; height:18px; background:#1e3a5f; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:0.6rem; color:#7ab7ef; font-weight:700; flex-shrink:0; margin-top:1px;
+}
+.step-text {
+    flex:1; font-size:0.73rem; color:#cbd5e6; background:transparent;
+    border:none; font-family:inherit; padding:0; resize:none; min-height:20px;
+}
+.step-text:focus { outline:none; }
+.step-del { background:none; border:none; color:#5a6e85; cursor:pointer; font-size:10px; padding:0 3px; }
+.step-del:hover { color:#f87171; }
+.add-step-item {
+    width:100%; background:none; border:none; color:#5a6e85; font-size:0.68rem;
+    cursor:pointer; text-align:left; padding:4px 2px; font-family:inherit; margin-top:2px;
+}
+.add-step-item:hover { color:#7ab7ef; }
+
+.block-code { background:#060a10; border-radius:8px; overflow:hidden; }
+.code-lang-bar {
+    background:#0f1824; padding:4px 8px; display:flex;
+    justify-content:space-between; align-items:center;
+}
+.code-lang-select {
+    background:transparent; border:none; color:#7ab7ef; font-size:0.68rem;
+    font-family:inherit; cursor:pointer;
+}
+.code-copy-btn {
+    background:none; border:none; color:#5a6e85; font-size:0.65rem;
+    cursor:pointer; font-family:inherit; padding:2px 6px; border-radius:4px;
+}
+.code-copy-btn:hover { background:#1e3a5f; color:#7ab7ef; }
+.block-code textarea {
+    width:100%; background:#060a10; border:none; color:#a8d8b8;
+    font-size:0.72rem; font-family:'Courier New',monospace; resize:vertical;
+    padding:8px; min-height:60px; tab-size:4;
+}
+.block-code textarea:focus { outline:none; }
+
+.block-link { background:#0d1520; border-radius:8px; padding:7px 9px; }
+.link-url-inp {
+    width:100%; background:#060a10; border:1px solid #1e2a3a; border-radius:6px;
+    color:#60a5fa; font-size:0.72rem; font-family:inherit; padding:5px 8px;
+}
+.link-url-inp:focus { outline:none; border-color:#3b82f6; }
+.link-label-inp {
+    width:100%; background:transparent; border:none; border-bottom:1px dashed #1e2a3a;
+    color:#cbd5e6; font-size:0.72rem; font-family:inherit; padding:4px 0; margin-top:5px;
+}
+.link-label-inp:focus { outline:none; border-bottom-color:#3b82f6; }
+
+/* FIX: block-delete-btn is sticky at the top-right, always visible regardless of scroll */
+.block-delete-btn {
+    position:sticky;
+    top:4px;
+    float:right;
+    margin: 0 0 -20px 4px;
+    background:#1a1f2a;
+    border:none;
+    color:#5a6e85;
+    cursor:pointer;
+    font-size:10px;
+    border-radius:4px;
+    padding:2px 5px;
+    z-index:5;
+    opacity:0.85;
+    line-height:1.4;
+}
+.block-delete-btn:hover { color:#f87171; background:#2a1a22; opacity:1; }

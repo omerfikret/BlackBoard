@@ -1,0 +1,19 @@
+/* Module tabs */
+.module-tabs { display:flex; gap:7px; flex-wrap:wrap; margin-top:8px; align-items:center; }
+.module-tab {
+    background:#11161f; border:none; padding:5px 13px; border-radius:20px;
+    color:#a0b3d0; font-size:0.73rem; cursor:pointer; transition:0.2s;
+    display:inline-flex; align-items:center; gap:7px; font-family:inherit;
+}
+.module-tab:hover { background:#1e2a3a; color:#fff; }
+.module-tab.active-tab { background:#1e3a5f; color:#fff; }
+.delete-module-btn {
+    background:none; border:none; color:#7f8c9a; cursor:pointer;
+    font-size:0.68rem; padding:1px 5px; border-radius:10px; opacity:0.7;
+}
+.delete-module-btn:hover { background:#b91c1c30; color:#f87171; opacity:1; }
+.add-module-btn {
+    background:#0f2b3f; border:none; padding:5px 11px; border-radius:20px;
+    color:#7ab7ef; font-size:0.7rem; cursor:pointer; display:flex;
+    align-items:center; gap:4px; font-family:inherit;
+}

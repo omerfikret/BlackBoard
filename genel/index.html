@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>BlackBoard</title>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/sidebar.css">
+<link rel="stylesheet" href="css/board-header.css">
+<link rel="stylesheet" href="css/line-editor.css">
+<link rel="stylesheet" href="css/module-tabs.css">
+<link rel="stylesheet" href="css/canvas.css">
+<link rel="stylesheet" href="css/card-base.css">
+<link rel="stylesheet" href="css/blocks.css">
+<link rel="stylesheet" href="css/card-toolbar-footer.css">
+<link rel="stylesheet" href="css/connections.css">
+<link rel="stylesheet" href="css/expand-modal.css">
+<link rel="stylesheet" href="css/modal.css">
+<link rel="stylesheet" href="css/search.css">
+<link rel="stylesheet" href="css/trash-modal.css">
+<link rel="stylesheet" href="css/toast.css">
+<link rel="stylesheet" href="css/undo-indicator.css">
+<link rel="stylesheet" href="css/scrollbar.css">
+</head>
+<body>
+<div class="app-layout">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>BlackBoard</h2>
+            <div class="save-indicator">
+                <div class="save-dot" id="SaveDot"></div>
+                <span class="save-text" id="SaveText">Kaydedildi</span>
+            </div>
+        </div>
+        <div class="create-buttons">
+            <button class="create-btn" id="AddFikirBtn">+ Fikir Ekle</button>
+            <button class="create-btn" id="AddProjeBtn">+ Proje Ekle</button>
+        </div>
+        <div class="search-box">
+            <input type="text" class="search-input" id="SearchInput" placeholder="🔍 Fikir veya proje ara...">
+            <div class="search-results" id="SearchResults"></div>
+        </div>
+        <div class="lists-container">
+            <div class="list-section">
+                <div class="section-label">FİKİRLER</div>
+                <div class="items-list" id="fikirlerList"></div>
+            </div>
+            <div class="list-section">
+                <div class="section-label">PROJELER</div>
+                <div class="items-list" id="projelerList"></div>
+            </div>
+            <div class="trash-section">
+                <button class="trash-btn" id="TrashBinBtn">🗑 Çöp Kutusu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main-board">
+        <div class="board-header">
+            <div class="header-top">
+                <div class="active-info">
+                    <h3 id="ActiveTitle">Ana Pano</h3>
+                </div>
+                <!-- FIX: Manuel kaydet butonu kaldırıldı, otomatik kayıt yeterli -->
+                <div class="board-actions" id="BoardActions">
+                    <button class="action-btn primary" id="AddNoteToActiveBtn">+ Not Ekle</button>
+                    <button class="action-btn" id="EnableLineEditBtn">Çizgileri Düzenle</button>
+                    <button class="action-btn" id="UndoBtn" title="Ctrl+Z">↩ Geri Al</button>
+                </div>
+            </div>
+            <div id="LineEditorContainer"></div>
+            <div id="ModuleTabsContainer" class="module-tabs"></div>
+        </div>
+        <div class="whiteboard-canvas" id="WhiteboardCanvas">
+            <div class="selection-rect" id="SelectionRect"></div>
+            <svg id="LinesSvg"></svg>
+            <div class="notes-container" id="NotesContainer"></div>
+        </div>
+    </div>
+</div>
+
+<div id="ToastMsg" class="toast-msg" style="opacity:0;"></div>
+<div id="UndoHint" class="undo-hint">Geri alındı</div>
+
+<script src="js/db.js"></script>
+<script src="js/state.js"></script>
+<script src="js/undo.js"></script>
+<script src="js/ui-helpers.js"></script>
+<script src="js/modal.js"></script>
+<script src="js/block-helpers.js"></script>
+<script src="js/render-block.js"></script>
+<script src="js/add-block-bar.js"></script>
+<script src="js/expand-modal.js"></script>
+<script src="js/note-card.js"></script>
+<script src="js/drag.js"></script>
+<script src="js/select.js"></script>
+<script src="js/connections.js"></script>
+<script src="js/line-edit.js"></script>
+<script src="js/mouse-selection.js"></script>
+<script src="js/fikir-ops.js"></script>
+<script src="js/proje-ops.js"></script>
+<script src="js/modul-ops.js"></script>
+<script src="js/note-ops.js"></script>
+<script src="js/render-sidebar.js"></script>
+<script src="js/render-module-tabs.js"></script>
+<script src="js/render-board.js"></script>
+<script src="js/trash.js"></script>
+<script src="js/events.js"></script>
+<script src="js/search.js"></script>
+<script src="js/start.js"></script>
+</body>
+</html>

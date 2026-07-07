@@ -1,0 +1,6 @@
+/* ─── UNDO INDICATOR ─── */
+.undo-hint {
+    position:fixed; bottom:66px; left:50%; transform:translateX(-50%);
+    background:#0f2b3f; color:#7ab7ef; padding:5px 14px; border-radius:30px;
+    font-size:0.7rem; z-index:400; pointer-events:none; opacity:0; transition:opacity 0.3s;
+}

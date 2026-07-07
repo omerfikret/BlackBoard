@@ -1,0 +1,40 @@
+/* ─── CARDS ─── */
+.idea-card {
+    position:absolute; width:260px;
+    background:#141a24; border-radius:14px; padding:0;
+    box-shadow:0 6px 18px rgba(0,0,0,0.4);
+    cursor:grab; border:1px solid rgba(59,130,246,0.25);
+    transition:box-shadow 0.2s; z-index:10; overflow:hidden;
+}
+.idea-card:active { cursor:grabbing; }
+.idea-card.selected-card { box-shadow:0 0 0 2px #3b82f6, 0 6px 18px rgba(0,0,0,0.4); z-index:100; }
+
+.card-titlebar {
+    display:flex; align-items:center; gap:6px;
+    padding:9px 10px 8px; border-bottom:1px solid #1e2a3a;
+    background:#101520;
+}
+.drag-area { cursor:grab; color:#5a6e8a; font-size:13px; padding:0 2px; user-select:none; flex-shrink:0; }
+.card-title {
+    font-weight:600; font-size:0.82rem; background:transparent; border:none;
+    color:#f0f4fe; flex:1; padding:2px 0; font-family:inherit;
+    border-bottom:1px dashed transparent;
+}
+.card-title:focus { outline:none; border-bottom-color:#3b82f6; }
+.card-type-badge {
+    font-size:0.58rem; background:#1e2a3a; padding:1px 6px;
+    border-radius:10px; color:#8ba0bc; flex-shrink:0;
+}
+.connector-btn {
+    cursor:pointer; background:#1e3a5f; width:22px; height:22px;
+    border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:12px; transition:all 0.2s; flex-shrink:0; border:none; color:#7ab7ef;
+}
+.connector-btn:hover { background:#3b82f6; color:#fff; }
+.connector-btn.active-connector { background:#f59e0b; box-shadow:0 0 8px #f59e0b; color:#000; }
+.delete-card {
+    background:none; border:none; color:#5a6e8a; width:20px; height:20px;
+    border-radius:20px; cursor:pointer; font-size:11px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+}
+.delete-card:hover { background:#7f1d1d; color:#fff; }
